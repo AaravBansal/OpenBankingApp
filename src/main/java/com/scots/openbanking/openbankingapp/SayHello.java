@@ -27,4 +27,9 @@ public class SayHello {
         return result.getBody();
     }
 
+    @GetMapping("/login/oauth2/code/google")
+    public void google() {
+        System.out.println("got your token from google");
+    }
+
 }
