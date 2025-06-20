@@ -1,5 +1,6 @@
 package com.scots.openbanking.openbankingapp;
 
+import com.scots.openbanking.openbankingapp.auth.TokenService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -8,9 +9,10 @@ import org.springframework.web.client.RestClient;
 @RestController
 public class SayHello {
 
-    @GetMapping("/westpac")
-    public String index() {
-        return "Greetings from Spring Boot!";
+    @GetMapping("/token")
+    public String index() throws Exception {
+        TokenService tokenService = new TokenService();
+        return tokenService.fetchAccessToken();
     }
 
     @GetMapping("/planets")
