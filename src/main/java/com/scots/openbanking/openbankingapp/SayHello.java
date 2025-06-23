@@ -15,6 +15,13 @@ public class SayHello {
         return tokenService.fetchAccessToken();
     }
 
+    @GetMapping("/login")
+    public String login(String username, String password) throws Exception {
+        System.out.println(username + password);
+        return username;
+    }
+
+
     @GetMapping("/planets")
     public String getPlanets() {
         RestClient restClient = RestClient.create();
