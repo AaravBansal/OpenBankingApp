@@ -1,27 +1,39 @@
-//package com.scots.openbanking.openbankingapp;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.security.core.annotation.AuthenticationPrincipal;
-//import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-//import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
-//import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.RestController;
-//
-//import java.util.UUID;
-//
-//@RestController
-//public class AuthController {
-//
-//
-//    @GetMapping("/token")
-//    public String getToken(@AuthenticationPrincipal OAuth2AuthenticationToken authToken) {
-//
-//        UUID uuid = UUID.randomUUID();
-//        OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
-//                authToken.getAuthorizedClientRegistrationId(),
-//                authToken.getName()
-//        );
-//        return client.getAccessToken().getTokenValue();
-//    }
-//}
+package com.scots.openbanking.openbankingapp;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/auth")
+public class AuthController {
+
+    private final AuthenticationManager authenticationManager;
+
+    @Autowired
+    public AuthController(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
+            SecurityContextHolder.getContext().setAuthentication(auth);
+            return ResponseEntity.ok("Login successful");
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
+    }
+}
