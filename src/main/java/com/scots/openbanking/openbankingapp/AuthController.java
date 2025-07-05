@@ -21,6 +21,13 @@ public class AuthController {
         this.authenticationManager = authenticationManager;
     }
 
+    @GetMapping("/login")
+    public ResponseEntity<String> loginGet() {
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body("Please POST your credentials to /api/auth/login");
+    }
+
+
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
         try {

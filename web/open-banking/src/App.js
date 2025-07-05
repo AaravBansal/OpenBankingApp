@@ -1,54 +1,15 @@
 import React from 'react';
-import {
-    Container,
-    Paper,
-    Typography,
-    Box,
-    TextField,
-    Button,
-} from '@mui/material';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LoginPage from './LoginPage';
+import Dashboard from './Dashboard';
 
-export default function LoginPage() {
+export default function App() {
     return (
-        <Container component="main" maxWidth="xs">
-            <Paper
-                elevation={6}
-                sx={{
-                    mt: 8,
-                    p: 4,
-                    borderRadius: 3,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
-            >
-                <Typography variant="h5" gutterBottom>
-                    Welcome to Open Banking
-                </Typography>
-                <Box component="form" noValidate sx={{ mt: 2, width: '100%' }}>
-                    <TextField
-                        fullWidth
-                        label="Username"
-                        margin="normal"
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        label="Password"
-                        margin="normal"
-                        type="password"
-                        required
-                    />
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3 }}
-                    >
-                        Sign In
-                    </Button>
-                </Box>
-            </Paper>
-        </Container>
+        <Router>
+            <Routes>
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+            </Routes>
+        </Router>
     );
 }
