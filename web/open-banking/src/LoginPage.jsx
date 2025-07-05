@@ -40,54 +40,72 @@ export default function LoginPage() {
     };
 
     return (
-        <Container component="main" maxWidth="xs">
-            <Paper
-                elevation={6}
-                sx={{
-                    mt: 8,
-                    p: 4,
-                    borderRadius: 3,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                }}
-            >
-                <Typography variant="h5" gutterBottom>
-                    Welcome to Open Banking
-                </Typography>
-                {error && (
-                    <Alert severity="error" sx={{ width: '100%', mt: 2 }}>
-                        {error}
-                    </Alert>
-                )}
-                <Box component="form" noValidate sx={{ mt: 2, width: '100%' }} onSubmit={handleSubmit}>
-                    <TextField
-                        fullWidth
-                        label="Username"
-                        margin="normal"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        label="Password"
-                        margin="normal"
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3 }}
-                    >
-                        Sign In
-                    </Button>
-                </Box>
-            </Paper>
-        </Container>
+        <Box
+            sx={{
+                minHeight: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'linear-gradient(to right, #0a5e96, #377ba9)',
+            }}
+        >
+            <Container maxWidth="xs">
+                <Paper
+                    elevation={8}
+                    sx={{
+                        p: 4,
+                        borderRadius: 4,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        backgroundColor: '#fff',
+                    }}
+                >
+                    {/* Logo or Name */}
+                    <Typography variant="h4" color="primary" gutterBottom sx={{ fontWeight: 700 }}>
+                        BankMesh
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Link it all. Know it all.
+                    </Typography>
+
+                    {/* Error message */}
+                    {error && (
+                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
+
+                    {/* Login form */}
+                    <Box component="form" noValidate sx={{ width: '100%' }} onSubmit={handleSubmit}>
+                        <TextField
+                            fullWidth
+                            label="Username"
+                            margin="normal"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                        <TextField
+                            fullWidth
+                            label="Password"
+                            type="password"
+                            margin="normal"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            sx={{ mt: 3 }}
+                        >
+                            Sign In
+                        </Button>
+                    </Box>
+                </Paper>
+            </Container>
+        </Box>
     );
 }
