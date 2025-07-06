@@ -1,9 +1,8 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './LoginPage';
 import Dashboard from './Dashboard';
 
-export default function App() {
+function App() {
     return (
         <Router>
             <Routes>
@@ -13,3 +12,4 @@ export default function App() {
         </Router>
     );
 }
+export default App;
