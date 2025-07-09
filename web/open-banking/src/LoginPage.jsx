@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-    Container,
     Paper,
     Typography,
     TextField,
@@ -8,35 +7,36 @@ import {
     Box,
     Divider,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-export default function LoginPage() {
+export default function LoginPage({ setGoogleUser }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
+    // REMOVED the useEffect for Google OAuth redirect
 
     const handleHardcodedLogin = async (e) => {
         e.preventDefault();
+        e.stopPropagation();
+        console.log('🚀 Login form submitted');
+
         try {
             const res = await fetch('http://localhost:8080/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ username, password }),
                 credentials: 'include',
-                redirect: 'manual',
             });
 
-            if (res.status === 302 || res.status === 301) {
-                const location = res.headers.get('Location');
-                if (location) {
-                    window.location.href = location;
-                    return;
-                }
+            if (res.ok) {
+                navigate('/dashboard');
+            } else {
+                const data = await res.json().catch(() => ({}));
+                alert(data.message || 'Login failed: Invalid credentials');
             }
-
-            if (!res.ok) throw new Error('Login failed');
-
-            alert('Login failed.');
         } catch (err) {
-            alert('Login failed.');
+            alert('Login error: ' + err.message);
         }
     };
 
@@ -48,7 +48,6 @@ export default function LoginPage() {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                fontFamily: `'Segoe UI', sans-serif`,
                 px: 2,
             }}
         >
@@ -63,35 +62,21 @@ export default function LoginPage() {
                     textAlign: 'center',
                 }}
             >
-                {/* Logo */}
-                <Box sx={{ mb: 2 }}>
-                    <img
-                        src="/bankmesh-logo.png"
-                        alt="BankMesh Logo"
-                        style={{
-                            width: '100%',
-                            maxWidth: 260,
-                            borderRadius: '16px',
-                        }}
-                    />
-                </Box>
+                <img
+                    src="/bankmesh-logo.png"
+                    alt="BankMesh Logo"
+                    style={{ width: '100%', maxWidth: 260, borderRadius: '16px', marginBottom: 16 }}
+                />
 
-                {/* Heading */}
-                <Typography
-                    variant="h4"
-                    fontWeight="700"
-                    gutterBottom
-                    color="text.primary"
-                    sx={{ fontSize: '2.2rem' }}
-                >
+                <Typography variant="h4" fontWeight="700" gutterBottom>
                     Welcome
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                <Typography variant="body2" sx={{ mb: 2 }}>
                     Sign in to your account
                 </Typography>
 
-                {/* Login Form */}
-                <Box component="form" onSubmit={handleHardcodedLogin} sx={{ width: '100%' }}>
+                {/* Use a real <form> here */}
+                <form onSubmit={handleHardcodedLogin} style={{ width: '100%' }}>
                     <TextField
                         label="Email Address"
                         fullWidth
@@ -100,7 +85,6 @@ export default function LoginPage() {
                         required
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
-                        InputLabelProps={{ shrink: true }}
                         sx={{ mb: 1.5 }}
                     />
                     <TextField
@@ -112,7 +96,6 @@ export default function LoginPage() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        InputLabelProps={{ shrink: true }}
                         sx={{ mb: 2 }}
                     />
                     <Button
@@ -123,18 +106,14 @@ export default function LoginPage() {
                     >
                         Sign In (Manual)
                     </Button>
-                </Box>
+                </form>
 
-                {/* Divider with OR */}
                 <Box sx={{ my: 2, display: 'flex', alignItems: 'center' }}>
                     <Divider sx={{ flexGrow: 1 }} />
-                    <Typography sx={{ mx: 1, color: 'text.secondary', fontSize: 13 }}>
-                        or
-                    </Typography>
+                    <Typography sx={{ mx: 1, fontSize: 13 }}>or</Typography>
                     <Divider sx={{ flexGrow: 1 }} />
                 </Box>
 
-                {/* Google Login Button */}
                 <Button
                     variant="outlined"
                     fullWidth
@@ -143,14 +122,11 @@ export default function LoginPage() {
                         borderRadius: 2,
                         backgroundColor: 'white',
                         border: '1px solid #ccc',
-                        textTransform: 'none',
                         fontWeight: 500,
                         fontSize: 14,
                         color: '#444',
                         mb: 2,
-                        '&:hover': {
-                            backgroundColor: '#f5f5f5',
-                        },
+                        '&:hover': { backgroundColor: '#f5f5f5' },
                     }}
                     href="http://localhost:8080/oauth2/authorization/google"
                 >
@@ -162,37 +138,18 @@ export default function LoginPage() {
                     Sign in with Google
                 </Button>
 
-                {/* Divider UNDER Google login */}
                 <Divider sx={{ mb: 2 }} />
 
-                {/* Inline Register Prompt */}
-                <Box sx={{ mt: 1.5, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
-                        Don’t have an account?
+                <Box sx={{ mt: 1.5 }}>
+                    <Typography variant="body2">
+                        Don’t have an account?{' '}
+                        <Button variant="text" size="small" onClick={() => navigate('/register')}>
+                            Create one now
+                        </Button>
                     </Typography>
-                    <Button
-                        variant="text"
-                        size="small"
-                        sx={{
-                            textTransform: 'none',
-                            fontSize: 13,
-                            fontWeight: 500,
-                            color: '#0a5e96',
-                            minWidth: 0,
-                            padding: 0,
-                        }}
-                        onClick={() => (window.location.href = '/register')}
-                    >
-                        Create one now
-                    </Button>
                 </Box>
 
-                {/* Footer */}
-                <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ mt: 3, display: 'block', fontSize: 11 }}
-                >
+                <Typography variant="caption" sx={{ mt: 3, display: 'block', fontSize: 11 }}>
                     © 2025 BankMesh. Trusted by 1 user worldwide.
                 </Typography>
             </Paper>

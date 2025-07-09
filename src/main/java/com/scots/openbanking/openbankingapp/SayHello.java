@@ -8,12 +8,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RestController
 public class SayHello {
 
-    @GetMapping("/token")
-    public String index() throws Exception {
-        // Replace this with your actual TokenService logic if needed
-        return "token endpoint (implement your token fetching logic)";
-    }
-
     @GetMapping("/planets")
     public ResponseEntity<String> getPlanets() {
         WebClient client = WebClient.create();

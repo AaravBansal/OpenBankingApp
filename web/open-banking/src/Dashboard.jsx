@@ -2,85 +2,102 @@ import React, { useEffect, useState } from 'react';
 import {
     Container,
     Typography,
+    Box,
     Paper,
     CircularProgress,
-    Alert,
-    Box,
+    Button,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
-    const [data, setData] = useState(null);
-    const [error, setError] = useState('');
     const [user, setUser] = useState(null);
+    const [planets, setPlanets] = useState({});
+    const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        fetch('http://localhost:8080/planets', {
-            credentials: 'include',
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Unauthorized or failed to fetch');
-                return res.text();
-            })
-            .then(setData)
-            .catch(err => setError(err.message));
-    }, []);
-
-    useEffect(() => {
+        // Fetch logged-in user info
         fetch('http://localhost:8080/me', {
+            method: 'GET',
             credentials: 'include',
         })
             .then(res => {
-                if (!res.ok) throw new Error('Failed to fetch user info');
+                if (!res.ok) throw new Error('Unauthorized');
                 return res.json();
             })
-            .then(setUser)
-            .catch(() => setUser({ username: 'Not logged in' }));
-    }, []);
+            .then(data => setUser(data))
+            .catch(err => {
+                console.error(err);
+                navigate('/login');
+            });
+
+        // Fetch deck shuffle info from /planets
+        fetch('http://localhost:8080/planets', {
+            method: 'GET',
+            credentials: 'include',
+        })
+            .then(res => res.json())
+            .then(data => {
+                setPlanets(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
+    }, [navigate]);
+
+    const handleLogout = () => {
+        fetch('http://localhost:8080/logout', {
+            method: 'POST',
+            credentials: 'include',
+        })
+            .then(() => navigate('/login'))
+            .catch(err => console.error('Logout failed', err));
+    };
+
+    if (loading) {
+        return (
+            <Box
+                sx={{
+                    height: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     return (
-        <Box
-            sx={{
-                minHeight: '100vh',
-                background: 'linear-gradient(to right, #0a5e96, #377ba9)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: 2,
-            }}
-        >
-            <Container maxWidth="sm">
-                <Paper
-                    elevation={6}
-                    sx={{
-                        p: 4,
-                        borderRadius: 3,
-                        backgroundColor: 'white',
-                    }}
-                >
-                    <Box sx={{ mb: 2 }}>
-                        <Typography variant="h4" sx={{ color: '#0a5e96' }}>
-                            Dashboard
-                        </Typography>
-                        {user && (
-                            <Typography variant="subtitle1" sx={{ color: '#555' }}>
-                                Logged in as: {user.username}
-                            </Typography>
-                        )}
-                    </Box>
-
-                    <Typography variant="h6" sx={{ color: '#377ba9', mb: 2 }}>
-                        Planet Data
+        <Container maxWidth="md" sx={{ mt: 5 }}>
+            <Paper sx={{ p: 4, borderRadius: 4 }}>
+                <Typography variant="h4" gutterBottom>
+                    Welcome to your Dashboard!
+                </Typography>
+                {user && (
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                        Logged in as: <strong>{user.firstName}</strong>
                     </Typography>
+                )}
 
-                    {error && <Alert severity="error">{error}</Alert>}
-                    {!data && !error && <CircularProgress />}
-                    {data && (
-                        <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', color: '#333' }}>
-                            {data}
-                        </pre>
-                    )}
-                </Paper>
-            </Container>
-        </Box>
+                <Typography variant="h6" sx={{ mt: 2 }}>
+                    Deck Shuffle Info:
+                </Typography>
+                <ul>
+                    <li>Deck ID: {planets.deck_id}</li>
+                    <li>Shuffled: {planets.shuffled ? 'Yes' : 'No'}</li>
+                    <li>Remaining Cards: {planets.remaining}</li>
+                </ul>
+
+                <Box sx={{ mt: 4 }}>
+                    <Button variant="outlined" color="secondary" onClick={handleLogout}>
+                        Logout
+                    </Button>
+                </Box>
+            </Paper>
+        </Container>
     );
 }
