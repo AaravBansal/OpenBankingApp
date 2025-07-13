@@ -4,7 +4,7 @@
       {
         "AccountId": "acc-1",
         "Amount": {
-          "Amount": "15000.50",
+          "Amount": "750,000",
           "Currency": "NZD"
         },
         "CreditDebitIndicator": "Credit",
@@ -15,7 +15,7 @@
       {
         "AccountId": "acc-2",
         "Amount": {
-          "Amount": "-3500.00",
+          "Amount": "500,000",
           "Currency": "NZD"
         },
         "CreditDebitIndicator": "Debit",
@@ -25,7 +25,7 @@
           {
             "Included": true,
             "Amount": {
-              "Amount": "5000.00",
+              "Amount": "5,000.00",
               "Currency": "NZD"
             },
             "Type": "Pre-Agreed"
@@ -35,7 +35,7 @@
       {
         "AccountId": "acc-3",
         "Amount": {
-          "Amount": "-430000.00",
+          "Amount": "730,000",
           "Currency": "NZD"
         },
         "CreditDebitIndicator": "Debit",
@@ -46,7 +46,7 @@
       {
         "AccountId": "acc-4",
         "Amount": {
-          "Amount": "1000.00",
+          "Amount": "423,000",
           "Currency": "NZD"
         },
         "CreditDebitIndicator": "Credit",

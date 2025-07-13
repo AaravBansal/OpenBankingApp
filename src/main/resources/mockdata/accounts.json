@@ -3,55 +3,55 @@
     "Account": [
       {
         "AccountId": "acc-1",
-        "Nickname": "Everyday Account",
-        "AccountType": "Personal",
+        "Nickname": "Investment",
+        "AccountType": "BNZ Home Loan",
         "Currency": "NZD",
-        "BankName": "Bank Mesh",
-        "BankUrl": "https://www.bankmesh.co.nz",
+        "BankName": "BNZ",
+        "BankUrl": "https://secure.bnz.co.nz/auth/personal-login",
         "Balance": "15000.50",
         "InterestRate": "1.50%",
         "MonthlyPayment": "0.00",
         "NextPaymentDue": "2025-08-01",
-        "Title": "Everyday Account"
+        "Title": "BNZ Home Loan"
       },
       {
         "AccountId": "acc-2",
-        "Nickname": "Credit Card",
-        "AccountType": "Credit",
+        "Nickname": "Investment",
+        "AccountType": "Home Loan",
         "Currency": "NZD",
-        "BankName": "Bank Mesh",
-        "BankUrl": "https://www.bankmesh.co.nz",
+        "BankName": "Westpac",
+        "BankUrl": "https://bank.westpac.co.nz/wone/app.html#login",
         "Balance": "-3500.00",
         "InterestRate": "18.00%",
         "MonthlyPayment": "250.00",
         "NextPaymentDue": "2025-08-05",
-        "Title": "Credit Card"
+        "Title": "Westpac Home Loan"
       },
       {
         "AccountId": "acc-3",
         "Nickname": "Home Loan",
-        "AccountType": "Mortgage",
+        "AccountType": "Investment",
         "Currency": "NZD",
-        "BankName": "Bank Mesh",
-        "BankUrl": "https://www.bankmesh.co.nz",
+        "BankName": "ANZ",
+        "BankUrl": "https://digital.anz.co.nz/preauth/web/service/login",
         "Balance": "-430000.00",
         "InterestRate": "5.90%",
         "MonthlyPayment": "1850.00",
         "NextPaymentDue": "2025-08-10",
-        "Title": "Home Loan"
+        "Title": "ANZ Home Loan"
       },
       {
         "AccountId": "acc-4",
-        "Nickname": "Savings Vault",
-        "AccountType": "Savings",
+        "Nickname": "Investment",
+        "AccountType": "Investment",
         "Currency": "NZD",
-        "BankName": "Bank Mesh",
-        "BankUrl": "https://www.bankmesh.co.nz",
+        "BankName": "ASB",
+        "BankUrl": "https://online.asb.co.nz/auth/?fm=header:login",
         "Balance": "1000.00",
         "InterestRate": "2.00%",
         "MonthlyPayment": "0.00",
         "NextPaymentDue": "2025-08-15",
-        "Title": "Savings Vault"
+        "Title": "ASB Home Loan"
       }
     ]
   }

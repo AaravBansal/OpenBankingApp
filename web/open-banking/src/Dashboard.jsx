@@ -18,6 +18,7 @@ import {
     InputLabel,
     Select,
     MenuItem as SelectMenuItem,
+    CircularProgress,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
@@ -41,9 +42,13 @@ const Dashboard = () => {
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
-    // Remove hardcoded bank accounts initially
+    // Bank accounts & loading states
     const [bankAccounts, setBankAccounts] = useState([]);
     const [loadingAccounts, setLoadingAccounts] = useState(false);
+
+    // For Add Account flow
+    const [addingAccount, setAddingAccount] = useState(false);
+    const [loadingNewAccounts, setLoadingNewAccounts] = useState(false);
 
     useEffect(() => {
         // Simulate fetching user data for dashboard
@@ -124,7 +129,7 @@ const Dashboard = () => {
             .catch(() => alert('Failed to update preferences'));
     };
 
-    // Load accounts from backend endpoint /account-details
+    // Fetch existing accounts from backend
     const fetchAccounts = () => {
         setLoadingAccounts(true);
         fetch('/account-details')
@@ -133,11 +138,28 @@ const Dashboard = () => {
                 return res.json();
             })
             .then((data) => {
-                // Backend returns a list of accounts directly
                 setBankAccounts(data || []);
             })
             .catch((err) => alert('Error loading accounts: ' + err.message))
             .finally(() => setLoadingAccounts(false));
+    };
+
+    // Called when user clicks Payments NZ button to add accounts
+    const loadPaymentsNZAccounts = () => {
+        setLoadingNewAccounts(true);
+        setTimeout(() => {
+            fetch('/account-details')
+                .then((res) => {
+                    if (!res.ok) throw new Error('Failed to load account details');
+                    return res.json();
+                })
+                .then((data) => {
+                    setBankAccounts((prev) => [...prev, ...(data || [])]);
+                    setAddingAccount(false);
+                })
+                .catch((err) => alert('Error loading accounts: ' + err.message))
+                .finally(() => setLoadingNewAccounts(false));
+        }, 2500); // 2.5 seconds fake delay for loading spinner
     };
 
     const renderModalContent = () => {
@@ -392,7 +414,7 @@ const Dashboard = () => {
                             </Typography>
                             <Typography>Nickname: {account.nickname}</Typography>
                             <Typography>
-                                Type: {account.accountType} - {account.accountSubType}
+                                Type: {account.accountType} {account.accountSubType}
                             </Typography>
                             <Typography>
                                 Balance: {account.balance} {account.currency}
@@ -424,24 +446,70 @@ const Dashboard = () => {
                     </Paper>
                 ))}
 
-                <Paper
-                    elevation={3}
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        bgcolor: 'rgba(255,255,255,0.3)',
-                        borderRadius: 3,
-                        p: 3,
-                        justifyContent: 'center',
-                        color: '#fff',
-                        cursor: 'pointer',
-                        fontStyle: 'italic',
-                        fontWeight: 600,
-                    }}
-                    onClick={fetchAccounts}
-                >
-                    {loadingAccounts ? 'Loading accounts...' : 'Add another account'}
-                </Paper>
+                {!addingAccount && (
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            bgcolor: 'rgba(255,255,255,0.40)',
+                            borderRadius: 3,
+                            p: 3,
+                            justifyContent: 'center',
+                            color: '#fff',
+                            cursor: 'pointer',
+                            fontStyle: 'italic',
+                            fontWeight: 600,
+                        }}
+                        onClick={() => setAddingAccount(true)}
+                    >
+                        Add another account
+                    </Paper>
+                )}
+
+                {addingAccount && (
+                    <Paper
+                        elevation={3}
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            bgcolor: 'rgba(255,255,255,0.40)',
+                            borderRadius: 3,
+                            p: 3,
+                            justifyContent: 'center',
+                            color: '#fff',
+                            fontWeight: 600,
+                        }}
+                    >
+                        {!loadingNewAccounts && (
+                            <>
+                                <Typography sx={{ mb: 2 }}>Select Account Provider:</Typography>
+                                <Button
+                                    variant="contained"
+                                    sx={{ mb: 1, bgcolor: '#1e90ff', '&:hover': { bgcolor: '#0056b3' } }}
+                                    onClick={loadPaymentsNZAccounts}
+                                >
+                                    Payments NZ
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    sx={{ color: '#fff' }}
+                                    onClick={() => setAddingAccount(false)}
+                                >
+                                    Cancel
+                                </Button>
+                            </>
+                        )}
+
+                        {loadingNewAccounts && (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <CircularProgress sx={{ color: '#1e90ff', mb: 2.5 }} />
+                                <Typography>Loading accounts from Payments NZ...</Typography>
+                            </Box>
+                        )}
+                    </Paper>
+                )}
             </Box>
 
             {/* Modal for hamburger sections */}
