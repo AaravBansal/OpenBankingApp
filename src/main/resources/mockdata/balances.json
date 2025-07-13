@@ -1,0 +1,59 @@
+{
+  "Data": {
+    "Balance": [
+      {
+        "AccountId": "acc-1",
+        "Amount": {
+          "Amount": "15000.50",
+          "Currency": "NZD"
+        },
+        "CreditDebitIndicator": "Credit",
+        "Type": "ClosingAvailable",
+        "DateTime": "2025-07-13T04:40:14.984Z",
+        "CreditLine": []
+      },
+      {
+        "AccountId": "acc-2",
+        "Amount": {
+          "Amount": "-3500.00",
+          "Currency": "NZD"
+        },
+        "CreditDebitIndicator": "Debit",
+        "Type": "ClosingAvailable",
+        "DateTime": "2025-07-13T04:40:14.984Z",
+        "CreditLine": [
+          {
+            "Included": true,
+            "Amount": {
+              "Amount": "5000.00",
+              "Currency": "NZD"
+            },
+            "Type": "Pre-Agreed"
+          }
+        ]
+      },
+      {
+        "AccountId": "acc-3",
+        "Amount": {
+          "Amount": "-430000.00",
+          "Currency": "NZD"
+        },
+        "CreditDebitIndicator": "Debit",
+        "Type": "ClosingAvailable",
+        "DateTime": "2025-07-13T04:40:14.984Z",
+        "CreditLine": []
+      },
+      {
+        "AccountId": "acc-4",
+        "Amount": {
+          "Amount": "1000.00",
+          "Currency": "NZD"
+        },
+        "CreditDebitIndicator": "Credit",
+        "Type": "ClosingAvailable",
+        "DateTime": "2025-07-13T04:40:14.984Z",
+        "CreditLine": []
+      }
+    ]
+  }
+}

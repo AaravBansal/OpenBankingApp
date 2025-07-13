@@ -1,0 +1,58 @@
+{
+  "Data": {
+    "Account": [
+      {
+        "AccountId": "acc-1",
+        "Nickname": "Everyday Account",
+        "AccountType": "Personal",
+        "Currency": "NZD",
+        "BankName": "Bank Mesh",
+        "BankUrl": "https://www.bankmesh.co.nz",
+        "Balance": "15000.50",
+        "InterestRate": "1.50%",
+        "MonthlyPayment": "0.00",
+        "NextPaymentDue": "2025-08-01",
+        "Title": "Everyday Account"
+      },
+      {
+        "AccountId": "acc-2",
+        "Nickname": "Credit Card",
+        "AccountType": "Credit",
+        "Currency": "NZD",
+        "BankName": "Bank Mesh",
+        "BankUrl": "https://www.bankmesh.co.nz",
+        "Balance": "-3500.00",
+        "InterestRate": "18.00%",
+        "MonthlyPayment": "250.00",
+        "NextPaymentDue": "2025-08-05",
+        "Title": "Credit Card"
+      },
+      {
+        "AccountId": "acc-3",
+        "Nickname": "Home Loan",
+        "AccountType": "Mortgage",
+        "Currency": "NZD",
+        "BankName": "Bank Mesh",
+        "BankUrl": "https://www.bankmesh.co.nz",
+        "Balance": "-430000.00",
+        "InterestRate": "5.90%",
+        "MonthlyPayment": "1850.00",
+        "NextPaymentDue": "2025-08-10",
+        "Title": "Home Loan"
+      },
+      {
+        "AccountId": "acc-4",
+        "Nickname": "Savings Vault",
+        "AccountType": "Savings",
+        "Currency": "NZD",
+        "BankName": "Bank Mesh",
+        "BankUrl": "https://www.bankmesh.co.nz",
+        "Balance": "1000.00",
+        "InterestRate": "2.00%",
+        "MonthlyPayment": "0.00",
+        "NextPaymentDue": "2025-08-15",
+        "Title": "Savings Vault"
+      }
+    ]
+  }
+}

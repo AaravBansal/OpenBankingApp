@@ -36,13 +36,17 @@ const Dashboard = () => {
         isGoogleUser: false,
     });
 
-    // Local state for Account Preferences form
     const [preferredName, setPreferredName] = useState('');
     const [title, setTitle] = useState('');
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
+    // Remove hardcoded bank accounts initially
+    const [bankAccounts, setBankAccounts] = useState([]);
+    const [loadingAccounts, setLoadingAccounts] = useState(false);
+
     useEffect(() => {
+        // Simulate fetching user data for dashboard
         fetch('/me')
             .then((res) => res.json())
             .then((data) => {
@@ -65,12 +69,8 @@ const Dashboard = () => {
             .catch(() => setUserFullName('User Name'));
     }, []);
 
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
+    const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+    const handleMenuClose = () => setAnchorEl(null);
 
     const openSection = (section) => {
         setModalContent(section);
@@ -80,12 +80,10 @@ const Dashboard = () => {
 
     const handleCloseModal = () => {
         setOpenModal(false);
-        // Reset password field & errors when modal closes
         setPassword('');
         setPasswordError('');
     };
 
-    // Validate password strength (simple example)
     const validatePassword = (pwd) => {
         if (pwd.length > 0 && pwd.length < 8) {
             setPasswordError('Password must be at least 8 characters');
@@ -95,11 +93,9 @@ const Dashboard = () => {
         return true;
     };
 
-    // Submit handler for Account Preferences
     const handleAccountPreferencesSubmit = () => {
         if (!validatePassword(password)) return;
 
-        // Build payload - only send password if changed
         const payload = {
             preferredName,
             title,
@@ -119,13 +115,29 @@ const Dashboard = () => {
                         preferredName,
                         title,
                     }));
-                    setUserFullName(`${userData.firstName} ${userData.lastName}`); // no last name change here
+                    setUserFullName(`${userData.firstName} ${userData.lastName}`);
                     handleCloseModal();
                 } else {
                     alert('Failed to update preferences');
                 }
             })
             .catch(() => alert('Failed to update preferences'));
+    };
+
+    // Load accounts from backend endpoint /account-details
+    const fetchAccounts = () => {
+        setLoadingAccounts(true);
+        fetch('/account-details')
+            .then((res) => {
+                if (!res.ok) throw new Error('Failed to load account details');
+                return res.json();
+            })
+            .then((data) => {
+                // Backend returns a list of accounts directly
+                setBankAccounts(data || []);
+            })
+            .catch((err) => alert('Error loading accounts: ' + err.message))
+            .finally(() => setLoadingAccounts(false));
     };
 
     const renderModalContent = () => {
@@ -136,7 +148,8 @@ const Dashboard = () => {
                         Account Preferences
                     </Typography>
                     <Typography variant="body2" mb={3} color="text.secondary">
-                        Manage your personal preferences below. You can update your preferred name, title, and password here.
+                        Manage your personal preferences below. You can update your preferred name,
+                        title, and password here.
                     </Typography>
                     <TextField
                         label="Preferred Name"
@@ -147,11 +160,7 @@ const Dashboard = () => {
                     />
                     <FormControl fullWidth sx={{ mb: 3 }}>
                         <InputLabel>Title</InputLabel>
-                        <Select
-                            value={title}
-                            label="Title"
-                            onChange={(e) => setTitle(e.target.value)}
-                        >
+                        <Select value={title} label="Title" onChange={(e) => setTitle(e.target.value)}>
                             <SelectMenuItem value="">None</SelectMenuItem>
                             <SelectMenuItem value="Mr">Mr</SelectMenuItem>
                             <SelectMenuItem value="Mrs">Mrs</SelectMenuItem>
@@ -178,14 +187,18 @@ const Dashboard = () => {
                         error={!!passwordError}
                     />
                     <Box sx={{ mt: 4, textAlign: 'right' }}>
-                        <Button variant="contained" onClick={handleAccountPreferencesSubmit} disabled={userData.isGoogleUser && password.length > 0}>
+                        <Button
+                            variant="contained"
+                            onClick={handleAccountPreferencesSubmit}
+                            disabled={userData.isGoogleUser && password.length > 0}
+                            sx={{ bgcolor: '#1e90ff', '&:hover': { bgcolor: '#0056b3' } }}
+                        >
                             Save Changes
                         </Button>
                     </Box>
                 </Box>
             );
         }
-
         if (modalContent === 'Security and Privacy') {
             return (
                 <Box sx={{ maxWidth: 500 }}>
@@ -193,24 +206,31 @@ const Dashboard = () => {
                         Security and Privacy
                     </Typography>
                     <Typography variant="body1" paragraph>
-                        At Bank Mesh, your security and privacy are our top priority. We employ advanced encryption protocols, multi-factor authentication, and continuous monitoring to protect your personal and financial information.
+                        At Bank Mesh, your security and privacy are our top priority. We employ advanced
+                        encryption protocols, multi-factor authentication, and continuous monitoring to
+                        protect your personal and financial information.
                     </Typography>
                     <Typography variant="body1" paragraph>
-                        Please ensure you keep your account credentials confidential. Never share your password or verification codes with anyone. Bank Mesh will never ask for your password via email or phone.
+                        Please ensure you keep your account credentials confidential. Never share your
+                        password or verification codes with anyone. Bank Mesh will never ask for your
+                        password via email or phone.
                     </Typography>
                     <Typography variant="body1" paragraph>
-                        We comply fully with data protection laws and never sell your personal information to third parties. You have the right to access, correct, and delete your personal data at any time via your account settings.
+                        We comply fully with data protection laws and never sell your personal information
+                        to third parties. You have the right to access, correct, and delete your personal
+                        data at any time via your account settings.
                     </Typography>
                     <Typography variant="body1" paragraph>
-                        For additional security, we recommend enabling two-factor authentication in your account preferences and regularly reviewing your login activity.
+                        For additional security, we recommend enabling two-factor authentication in your
+                        account preferences and regularly reviewing your login activity.
                     </Typography>
                     <Typography variant="body1" paragraph>
-                        If you have any concerns about your account security or privacy, please contact our support team immediately.
+                        If you have any concerns about your account security or privacy, please contact our
+                        support team immediately.
                     </Typography>
                 </Box>
             );
         }
-
         if (modalContent === 'Help and Support') {
             return (
                 <Box sx={{ maxWidth: 450 }}>
@@ -218,10 +238,15 @@ const Dashboard = () => {
                         Help and Support
                     </Typography>
                     <Typography variant="body1" paragraph>
-                        Need assistance? Our support team is here to help you 24/7. Whether you have questions about your account, transactions, or technical issues, we’re ready to assist.
+                        Need assistance? Our support team is here to help you 24/7. Whether you have questions
+                        about your account, transactions, or technical issues, we’re ready to assist.
                     </Typography>
                     <Typography variant="body1" paragraph>
-                        Visit our <a href="https://www.bankmesh.co.nz/support" target="_blank" rel="noreferrer">Support Center</a> for FAQs, guides, and troubleshooting tips.
+                        Visit our{' '}
+                        <a href="https://www.bankmesh.co.nz/support" target="_blank" rel="noreferrer">
+                            Support Center
+                        </a>{' '}
+                        for FAQs, guides, and troubleshooting tips.
                     </Typography>
                     <Typography variant="body1" paragraph>
                         You can also contact us directly via live chat or email support@bankmesh.co.nz.
@@ -232,7 +257,6 @@ const Dashboard = () => {
                 </Box>
             );
         }
-
         if (modalContent === 'Sign Out') {
             return (
                 <Box sx={{ maxWidth: 360, textAlign: 'center' }}>
@@ -243,11 +267,14 @@ const Dashboard = () => {
                         Are you sure you want to sign out of your Bank Mesh account?
                     </Typography>
                     <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-                        <Button variant="contained" color="error" onClick={() => {
-                            // Implement sign out logic here
-                            alert('Signed out');
-                            handleCloseModal();
-                        }}>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={() => {
+                                alert('Signed out');
+                                handleCloseModal();
+                            }}
+                        >
                             Sign Out
                         </Button>
                         <Button variant="outlined" onClick={handleCloseModal}>
@@ -257,8 +284,6 @@ const Dashboard = () => {
                 </Box>
             );
         }
-
-        // fallback placeholder
         return (
             <Box sx={{ minWidth: 400 }}>
                 <Typography variant="h5" fontWeight="bold" mb={2}>
@@ -271,27 +296,6 @@ const Dashboard = () => {
         );
     };
 
-    const bankAccounts = [
-        {
-            id: 1,
-            title: 'Primary House Loan - BNZ',
-            balance: '$430,000',
-            interestRate: '5.6%',
-            monthlyPayment: '$2,150',
-            nextPaymentDue: '15 August 2025',
-            bankUrl: 'https://www.bnz.co.nz',
-        },
-        {
-            id: 2,
-            title: 'Car Loan - ASB',
-            balance: '$12,300',
-            interestRate: '6.8%',
-            monthlyPayment: '$350',
-            nextPaymentDue: '1 August 2025',
-            bankUrl: 'https://www.asb.co.nz',
-        },
-    ];
-
     return (
         <Box
             sx={{
@@ -301,7 +305,12 @@ const Dashboard = () => {
                 pb: 4,
             }}
         >
-            <AppBar position="static" color="transparent" elevation={0} sx={{ borderBottom: '1px solid #ddd', bgcolor: '#fff' }}>
+            <AppBar
+                position="static"
+                color="transparent"
+                elevation={0}
+                sx={{ borderBottom: '1px solid #ddd', bgcolor: '#fff' }}
+            >
                 <Toolbar sx={{ justifyContent: 'space-between' }}>
                     <Stack direction="row" alignItems="center" spacing={4}>
                         <Box
@@ -309,17 +318,24 @@ const Dashboard = () => {
                             src="/bankmesh-logo.png"
                             alt="Bank Mesh Logo"
                             sx={{ height: 48, width: 'auto', cursor: 'pointer' }}
-                            onClick={() => window.location.href = '/dashboard'}
+                            onClick={() => (window.location.href = '/dashboard')}
                         />
-                        <Typography variant="h6" color="primary" fontWeight="bold" sx={{ cursor: 'pointer' }}>
+                        <Typography variant="h6" fontWeight="bold" sx={{ cursor: 'pointer', color: '#1e90ff' }}>
                             Dashboard
                         </Typography>
-                        <Button color="primary" sx={{ textTransform: 'none' }}>Accounts</Button>
-                        <Button color="primary" sx={{ textTransform: 'none' }}>Transactions</Button>
+                        <Button color="primary" sx={{ textTransform: 'none', color: '#1e90ff' }}>
+                            Accounts
+                        </Button>
+                        <Button color="primary" sx={{ textTransform: 'none', color: '#1e90ff' }}>
+                            Transactions
+                        </Button>
                     </Stack>
 
                     <Stack direction="row" alignItems="center" spacing={1}>
-                        <Typography variant="body1" sx={{ color: '#333', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                        <Typography
+                            variant="body1"
+                            sx={{ color: '#333', fontWeight: 600, whiteSpace: 'nowrap' }}
+                        >
                             {userFullName}
                         </Typography>
 
@@ -329,7 +345,7 @@ const Dashboard = () => {
                             aria-label="menu"
                             onClick={handleMenuOpen}
                             size="large"
-                            sx={{ ml: 1, color: '#333' }}
+                            sx={{ ml: 1, color: '#1e90ff' }}
                         >
                             <MenuIcon />
                         </IconButton>
@@ -339,8 +355,12 @@ const Dashboard = () => {
                             onClose={handleMenuClose}
                             PaperProps={{ sx: { mt: 1.5, minWidth: 200 } }}
                         >
-                            <MenuItem onClick={() => openSection('Account Preferences')}>Account Preferences</MenuItem>
-                            <MenuItem onClick={() => openSection('Security and Privacy')}>Security and Privacy</MenuItem>
+                            <MenuItem onClick={() => openSection('Account Preferences')}>
+                                Account Preferences
+                            </MenuItem>
+                            <MenuItem onClick={() => openSection('Security and Privacy')}>
+                                Security and Privacy
+                            </MenuItem>
                             <MenuItem onClick={() => openSection('Help and Support')}>Help and Support</MenuItem>
                             <MenuItem onClick={() => openSection('Sign Out')}>Sign Out</MenuItem>
                         </Menu>
@@ -351,7 +371,7 @@ const Dashboard = () => {
             <Box sx={{ maxWidth: 900, mx: 'auto', mt: 5, px: 2 }}>
                 {bankAccounts.map((account) => (
                     <Paper
-                        key={account.id}
+                        key={account.accountId}
                         elevation={3}
                         sx={{
                             display: 'flex',
@@ -364,15 +384,19 @@ const Dashboard = () => {
                         }}
                     >
                         <Box sx={{ mr: 3 }}>
-                            <HomeIcon sx={{ fontSize: 56, color: '#70a2ff' }} />
+                            <HomeIcon sx={{ fontSize: 56, color: '#1e90ff' }} />
                         </Box>
                         <Box sx={{ flexGrow: 1 }}>
-                            <Typography variant="h6" fontWeight="bold">{account.title}</Typography>
-                            <Typography>Outstanding Balance: {account.balance}</Typography>
-                            <Typography>
-                                Interest Rate: {account.interestRate} | Monthly Payment: {account.monthlyPayment}
+                            <Typography variant="h6" fontWeight="bold">
+                                {account.title}
                             </Typography>
-                            <Typography>Next Payment Due: {account.nextPaymentDue}</Typography>
+                            <Typography>Nickname: {account.nickname}</Typography>
+                            <Typography>
+                                Type: {account.accountType} - {account.accountSubType}
+                            </Typography>
+                            <Typography>
+                                Balance: {account.balance} {account.currency}
+                            </Typography>
                         </Box>
                         <Box sx={{ textAlign: 'right' }}>
                             <Button
@@ -383,7 +407,15 @@ const Dashboard = () => {
                                     '&:hover': { bgcolor: '#0056b3' },
                                     textTransform: 'none',
                                 }}
-                                onClick={() => window.open(account.bankUrl, '_blank')}
+                                onClick={() => {
+                                    // Map bankId to URLs as you like
+                                    const bankUrlMap = {
+                                        BNZNZ22: 'https://www.bnz.co.nz',
+                                        ASBNZ22: 'https://www.asb.co.nz',
+                                    };
+                                    const url = bankUrlMap[account.bankId] || 'https://www.bankmesh.co.nz';
+                                    window.open(url, '_blank');
+                                }}
                             >
                                 Bank Mesh
                             </Button>
@@ -406,9 +438,9 @@ const Dashboard = () => {
                         fontStyle: 'italic',
                         fontWeight: 600,
                     }}
-                    onClick={() => alert('Add another account clicked')}
+                    onClick={fetchAccounts}
                 >
-                    Add another account
+                    {loadingAccounts ? 'Loading accounts...' : 'Add another account'}
                 </Paper>
             </Box>
 
