@@ -162,6 +162,24 @@ const Dashboard = () => {
         }, 2500); // 2.5 seconds fake delay for loading spinner
     };
 
+    // New function added exactly here:
+    const loadPaymentsNZRealAccounts = () => {
+        setLoadingNewAccounts(true);
+        setTimeout(() => {
+            fetch('http://localhost:8080/api/accounts') // <-- your real API endpoint here
+                .then((res) => {
+                    if (!res.ok) throw new Error('Failed to load real account details');
+                    return res.json();
+                })
+                .then((data) => {
+                    setBankAccounts((prev) => [...prev, ...(data || [])]);
+                    setAddingAccount(false);
+                })
+                .catch((err) => alert('Error loading real accounts: ' + err.message))
+                .finally(() => setLoadingNewAccounts(false));
+        }, 2500);
+    };
+
     const renderModalContent = () => {
         if (modalContent === 'Account Preferences') {
             return (
@@ -492,6 +510,16 @@ const Dashboard = () => {
                                 >
                                     Payments NZ
                                 </Button>
+
+                                {/* NEW PNZ (Real) button added below */}
+                                <Button
+                                    variant="contained"
+                                    sx={{ mb: 1, bgcolor: '#1e90ff', '&:hover': { bgcolor: '#0056b3' } }}
+                                    onClick={loadPaymentsNZRealAccounts}
+                                >
+                                    PNZ (Real)
+                                </Button>
+
                                 <Button
                                     variant="outlined"
                                     sx={{ color: '#fff' }}
@@ -518,7 +546,7 @@ const Dashboard = () => {
                 onClose={handleCloseModal}
                 closeAfterTransition
                 slots={{ backdrop: Backdrop }}
-                slotProps={{ backdrop: { timeout: 500 } }}
+                slotProps={{ backdrop: { timeout: 300 } }}
             >
                 <Fade in={openModal}>
                     <Box
@@ -531,6 +559,11 @@ const Dashboard = () => {
                             borderRadius: 3,
                             boxShadow: 24,
                             p: 4,
+                            minWidth: 320,
+                            maxWidth: 600,
+                            maxHeight: '80vh',
+                            overflowY: 'auto',
+                            outline: 'none',
                         }}
                     >
                         {renderModalContent()}

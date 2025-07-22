@@ -37,15 +37,9 @@ public class AccountDetailsService {
         }
         BalancesWrapper balancesWrapper = objectMapper.readValue(balancesStream, BalancesWrapper.class);
 
-        List<Account> accounts = accountsWrapper.getData().getAccount();
-        if (accounts == null) {
-            throw new IllegalStateException("accounts.json is missing the 'Data.Account' structure or is malformed");
-        }
+        List<Account> accounts = getAccounts(accountsWrapper);
 
-        List<Balance> balances = balancesWrapper.getData().getBalance();
-        if (balances == null) {
-            throw new IllegalStateException("balances.json is missing the 'Data.Balance' structure or is malformed");
-        }
+        List<Balance> balances = getBalances(balancesWrapper);
 
         // Map AccountId to Balance object for quick lookup
         Map<String, Balance> balanceMap = balances.stream()
@@ -70,5 +64,21 @@ public class AccountDetailsService {
             dto.setBankId(acc.getBankName()); // or acc.getBankUrl() depending on use
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    private static List<Balance> getBalances(BalancesWrapper balancesWrapper) {
+        List<Balance> balances = balancesWrapper.getData().getBalance();
+        if (balances == null) {
+            throw new IllegalStateException("balances.json is missing the 'Data.Balance' structure or is malformed");
+        }
+        return balances;
+    }
+
+    private static List<Account> getAccounts(AccountsWrapper accountsWrapper) {
+        List<Account> accounts = accountsWrapper.getData().getAccount();
+        if (accounts == null) {
+            throw new IllegalStateException("accounts.json is missing the 'Data.Account' structure or is malformed");
+        }
+        return accounts;
     }
 }

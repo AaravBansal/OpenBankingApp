@@ -23,7 +23,7 @@ public class PaymentsNzController {
 
 
         // Step 1: Get access token
-        String accessToken = tokenService.fetchAccessToken();
+        String accessToken = tokenService.getAccessToken();
 
         // Step 2: Prepare HTTP headers
         HttpHeaders headers = new HttpHeaders();

@@ -1,59 +1,120 @@
 package com.scots.openbanking.openbankingapp.auth;
 
-import com.scots.openbanking.openbankingapp.config.LoggingRequestInterceptor;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URLEncoder;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Map;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.time.Instant;
+import java.util.*;
 
+@Slf4j
 @Service
 public class TokenService {
 
     @Value("${paymentsnz.client-id}")
     private String clientId;
 
-    @Value("${paymentsnz.token-url}")
-    private String tokenUrl;
+    @Value("${paymentsnz.token-uri}")
+    private String tokenUri;
 
-    @Value("${paymentsnz.private-key-path}")
-    private String privateKeyPath;
+    @Value("${paymentsnz.private-key-pem-path}")
+    private String privateKeyPemPath;
 
-    public String fetchAccessToken() throws Exception {
+    @Value("${paymentsnz.key-id}")
+    private String keyId;
 
-        tokenUrl = "https://api-nomatls.apicentre.middleware.co.nz/oauth/v2.0/token";
-        clientId = "00e97d9d67994d7abe46f36798b6faaa";
-        privateKeyPath = "src/main/resources/private_key.pem";
+    private final ResourceLoader resourceLoader;
+    private PrivateKey privateKey;
 
-        String clientAssertion = JwtUtil.generateClientAssertion(clientId, tokenUrl, privateKeyPath);
+    public TokenService(ResourceLoader resourceLoader) {
+        this.resourceLoader = resourceLoader;
+    }
 
-        System.out.println("JWT is " + clientAssertion);
+    @PostConstruct
+    public void init() throws Exception {
+        loadPrivateKey();
+    }
+
+    private void loadPrivateKey() throws Exception {
+        // Load private key using the configured path
+        Resource resource = resourceLoader.getResource(privateKeyPemPath);
+        try (InputStream is = resource.getInputStream()) {
+            String key = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            key = key.replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace("-----END PRIVATE KEY-----", "")
+                    .replaceAll("\\s", "");
+            byte[] keyBytes = Base64.getDecoder().decode(key);
+            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+            KeyFactory kf = KeyFactory.getInstance("RSA");
+            this.privateKey = kf.generatePrivate(spec);
+        }
+        log.info("Private key loaded successfully");
+    }
+
+    public String getAccessToken() throws Exception {
+        JWSSigner signer = new RSASSASigner(privateKey);
+        Instant now = Instant.now();
+
+        JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+                .issuer(clientId)
+                .subject(clientId)
+                .audience(tokenUri)  // use tokenUri from config here
+                .issueTime(Date.from(now))
+                .expirationTime(Date.from(now.plusSeconds(300)))
+                .jwtID(UUID.randomUUID().toString())
+                .build();
+
+        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                .type(JOSEObjectType.JWT)
+                .keyID(keyId)
+                .build();
+
+        SignedJWT signedJWT = new SignedJWT(header, claimsSet);
+        signedJWT.sign(signer);
+        String clientAssertion = signedJWT.serialize();
+
+        log.info("Generated client_assertion JWT: {}", clientAssertion);
+
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("grant_type", "client_credentials");
+        form.add("client_id", clientId);
+        form.add("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        form.add("client_assertion", clientAssertion);
+        form.add("scope", "accounts balances");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setCacheControl("no-cache");
 
-        // --- CORRECTED BODY CONSTRUCTION ---
-        String body = "grant_type=client_credentials"
-                + "&scope=" + URLEncoder.encode("openid accounts payments", StandardCharsets.UTF_8)
-                + "&client_id=" + URLEncoder.encode(clientId, StandardCharsets.UTF_8) // Re-added client_id
-                + "&client_assertion_type=" + URLEncoder.encode("urn:ietf:params:oauth:client-assertion-type:jwt-bearer", StandardCharsets.UTF_8)
-                + "&client_assertion=" + URLEncoder.encode(clientAssertion, StandardCharsets.UTF_8); // Re-added URL encoding
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(form, headers);
 
-
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.setInterceptors(Collections.singletonList(new LoggingRequestInterceptor()));
-
-        ResponseEntity<Map> response = restTemplate.exchange(tokenUrl, HttpMethod.POST, entity, Map.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(tokenUri, entity, String.class);
 
         if (response.getStatusCode().is2xxSuccessful()) {
-            return (String) response.getBody().get("access_token");
+            log.info("Token response: {}", response.getBody());
+            return response.getBody();  // parse JSON later to extract "access_token"
         } else {
-            throw new RuntimeException("Failed to retrieve token: " + response);
+            log.error("Token request failed: {}", response.getStatusCode());
+            log.error("Response body: {}", response.getBody());
+            throw new RuntimeException("Failed to obtain access token: " + response.getStatusCode());
         }
     }
 }

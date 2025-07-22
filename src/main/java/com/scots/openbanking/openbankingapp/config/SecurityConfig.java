@@ -29,10 +29,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> {})  // Empty cors config, real config below
+                .cors(cors -> {})  // CORS config below
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**", "/login", "/register", "/oauth2/**", "/me").permitAll()
+                        .requestMatchers(
+                                "/api/**",
+                                "/login",
+                                "/register",
+                                "/oauth2/**",
+                                "/me",
+                                "/account-details-real" // ✅ Add this line
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
