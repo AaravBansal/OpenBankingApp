@@ -26,7 +26,7 @@ public class AccountService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
-        headers.set("x-fapi-financial-id", "YOUR_FINANCIAL_ID");  // Replace with your actual financial ID
+        headers.set("x-fapi-financial-id", "FINANCIAL_ID");
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 

@@ -60,7 +60,7 @@ public class AccountDetailsService {
             dto.setCurrency(currency);
             dto.setBalance(amount);
             dto.setAccountType(acc.getAccountType());
-            dto.setAccountSubType(null); // no field in your JSON, so null or default
+            dto.setAccountSubType(null); // no field in JSON, so null or default
             dto.setBankId(acc.getBankName()); // or acc.getBankUrl() depending on use
             return dto;
         }).collect(Collectors.toList());

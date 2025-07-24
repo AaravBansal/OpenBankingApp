@@ -1,5 +1,7 @@
 package com.scots.openbanking.openbankingapp.dto;
 
+// Data transfer Object (DTO)
+
 public class AccountDTO {
 
     private String accountId;
