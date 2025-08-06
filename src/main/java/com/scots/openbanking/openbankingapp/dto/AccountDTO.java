@@ -1,16 +1,23 @@
 package com.scots.openbanking.openbankingapp.dto;
 
-// Data transfer Object (DTO)
-
+// Data transfer Object (DTO) for exposing account data to the frontend or API consumers
 public class AccountDTO {
 
+    // Unique identifier for the account
     private String accountId;
+    // Title or label for the account
     private String title;
+    // User's nickname for the account
     private String nickname;
+    // Currency code (e.g., GBP, USD)
     private String currency;
+    // Current balance as a string
     private String balance;
+    // Type of account (e.g., savings, checking)
     private String accountType;
+    // Subtype of account (if any)
     private String accountSubType;
+    // Identifier for the bank
     private String bankId;
 
     // Getters and Setters

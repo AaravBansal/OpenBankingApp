@@ -3,23 +3,27 @@ package com.scots.openbanking.openbankingapp.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+// User entity representing a user document in MongoDB
 @Document(collection = "users")
 public class User {
     @Id
-    private String id;
+    private String id; // Unique identifier for the user
 
+    // User profile fields
     private String email;
     private String firstName;
     private String lastName;
     private String preferredName;
     private String title;
     private String dateOfBirth;
-    private boolean googleUser;
+    private boolean googleUser; // True if registered via Google OAuth
     private String password;
-    private boolean registered;
+    private boolean registered; // True if registration is complete
 
+    // Default constructor
     public User() {}
 
+    // Parameterized constructor for creating a user with all fields
     public User(String email, String firstName, String lastName, String preferredName, String title, String dateOfBirth, boolean googleUser, String password, boolean registered) {
         this.email = email;
         this.firstName = firstName;
@@ -32,6 +36,7 @@ public class User {
         this.registered = registered;
     }
 
+    // Getters and setters for all fields
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

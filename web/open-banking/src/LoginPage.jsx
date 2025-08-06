@@ -9,19 +9,22 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+// LoginPage component handles user login (manual and Google OAuth)
 export default function LoginPage({ setGoogleUser }) {
+    // State for username and password fields
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    // React Router navigation hook
     const navigate = useNavigate();
 
-    // REMOVED the useEffect for Google OAuth redirect
-
+    // Handles manual login form submission
     const handleHardcodedLogin = async (e) => {
         e.preventDefault();
         e.stopPropagation();
         console.log('🚀 Login form submitted');
 
         try {
+            // Send login request to backend
             const res = await fetch('http://localhost:8080/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -30,12 +33,15 @@ export default function LoginPage({ setGoogleUser }) {
             });
 
             if (res.ok) {
+                // On success, redirect to dashboard
                 navigate('/dashboard');
             } else {
+                // On failure, show error message
                 const data = await res.json().catch(() => ({}));
                 alert(data.message || 'Login failed: Invalid credentials');
             }
         } catch (err) {
+            // Handle network or server errors
             alert('Login error: ' + err.message);
         }
     };
@@ -62,12 +68,14 @@ export default function LoginPage({ setGoogleUser }) {
                     textAlign: 'center',
                 }}
             >
+                {/* Logo */}
                 <img
                     src="/bankmesh-logo.png"
                     alt="BankMesh Logo"
                     style={{ width: '100%', maxWidth: 260, borderRadius: '16px', marginBottom: 16 }}
                 />
 
+                {/* Welcome message */}
                 <Typography variant="h4" fontWeight="700" gutterBottom>
                     Welcome
                 </Typography>
@@ -75,7 +83,7 @@ export default function LoginPage({ setGoogleUser }) {
                     Sign in to your account
                 </Typography>
 
-                {/* Use a real <form> here */}
+                {/* Manual login form */}
                 <form onSubmit={handleHardcodedLogin} style={{ width: '100%' }}>
                     <TextField
                         label="Email Address"
@@ -108,12 +116,14 @@ export default function LoginPage({ setGoogleUser }) {
                     </Button>
                 </form>
 
+                {/* Divider with "or" */}
                 <Box sx={{ my: 2, display: 'flex', alignItems: 'center' }}>
                     <Divider sx={{ flexGrow: 1 }} />
                     <Typography sx={{ mx: 1, fontSize: 13 }}>or</Typography>
                     <Divider sx={{ flexGrow: 1 }} />
                 </Box>
 
+                {/* Google OAuth login button */}
                 <Button
                     variant="outlined"
                     fullWidth
@@ -140,6 +150,7 @@ export default function LoginPage({ setGoogleUser }) {
 
                 <Divider sx={{ mb: 2 }} />
 
+                {/* Link to registration page */}
                 <Box sx={{ mt: 1.5 }}>
                     <Typography variant="body2">
                         Don’t have an account?{' '}
@@ -149,6 +160,7 @@ export default function LoginPage({ setGoogleUser }) {
                     </Typography>
                 </Box>
 
+                {/* Footer */}
                 <Typography variant="caption" sx={{ mt: 3, display: 'block', fontSize: 11 }}>
                     © 2025 BankMesh. Trusted by 1 user worldwide.
                 </Typography>

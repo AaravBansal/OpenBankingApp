@@ -22,15 +22,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    // Inject custom OAuth2 success handler, user service, and password encoder
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
+    // Main security filter chain configuration
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                // Enable CORS with custom configuration
                 .cors(cors -> {})  // CORS config below
+                // Disable CSRF for simplicity (not recommended for production)
                 .csrf(csrf -> csrf.disable())
+                // Configure which endpoints are public and which require authentication
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/**",
@@ -42,22 +47,27 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                // Configure form login (manual username/password)
                 .formLogin(form -> form
                         .loginProcessingUrl("/login")
                         .successHandler((request, response, authentication) -> {
+                            // On successful login, return JSON response
                             response.setStatus(HttpServletResponse.SC_OK);
                             response.setContentType("application/json");
                             response.getWriter().write("{\"status\":\"success\"}");
                         })
                         .failureHandler((request, response, exception) -> {
+                            // On failed login, return JSON error
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
                             response.getWriter().write("{\"status\":\"fail\", \"message\":\"Invalid credentials\"}");
                         })
                 )
+                // Configure OAuth2 login (e.g., Google)
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                 )
+                // Handle unauthorized access attempts
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setContentType("application/json");
@@ -69,6 +79,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    // Configure authentication provider to use custom user service and password encoder
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -77,11 +88,13 @@ public class SecurityConfig {
         return provider;
     }
 
+    // Expose authentication manager bean for use elsewhere
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    // Configure CORS to allow requests from frontend (localhost:3000)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

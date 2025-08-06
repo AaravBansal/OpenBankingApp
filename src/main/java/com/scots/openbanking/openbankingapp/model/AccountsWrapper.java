@@ -3,10 +3,11 @@ package com.scots.openbanking.openbankingapp.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
+// Wrapper class for account data, matching the expected JSON structure
 public class AccountsWrapper {
 
     @JsonProperty("Data")
-    private Data Data;
+    private Data Data; // Top-level "Data" field
 
     public Data getData() {
         return Data;
@@ -16,10 +17,11 @@ public class AccountsWrapper {
         this.Data = data;
     }
 
+    // Nested static class representing the "Data" object
     public static class Data {
 
         @JsonProperty("Account")
-        private List<Account> Account;
+        private List<Account> Account; // List of accounts
 
         public List<Account> getAccount() {
             return Account;
@@ -30,6 +32,7 @@ public class AccountsWrapper {
         }
     }
 
+    // Nested static class representing an individual account
     public static class Account {
 
         @JsonProperty("AccountId")
@@ -65,7 +68,7 @@ public class AccountsWrapper {
         @JsonProperty("Title")
         private String title;
 
-        // Getters and setters
+        // Getters and setters for all account fields
         public String getAccountId() {
             return accountId;
         }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+// Custom service to handle user info from OAuth2 providers (e.g., Google)
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -19,6 +20,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        // Load user info from OAuth2 provider
         OAuth2User oauth2User = super.loadUser(userRequest);
 
         // Extract user attributes from OAuth2 provider (Google)
@@ -27,13 +29,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String lastName = oauth2User.getAttribute("family_name");
 
         if (email == null) {
+            // Email is required for user identification
             throw new OAuth2AuthenticationException("Email not found from OAuth2 provider");
         }
 
-        // Check if user already exists
+        // Check if user already exists in the database
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            // Create and save a new user based on Google info
+            // If not, create and save a new user based on Google info
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setFirstName(firstName);
@@ -43,6 +46,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userRepository.save(newUser);
         }
 
+        // Return the OAuth2User object for further processing
         return oauth2User;
     }
 }

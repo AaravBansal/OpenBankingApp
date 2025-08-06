@@ -11,7 +11,9 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+// RegistrationPage handles user sign-up and validation
 export default function RegistrationPage() {
+    // State for form fields
     const [form, setForm] = useState({
         firstName: '',
         lastName: '',
@@ -23,27 +25,33 @@ export default function RegistrationPage() {
         dob: '',
     });
 
+    // State for error, success, and loading indicators
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // List of possible titles for the user
     const titles = ['Mr', 'Ms', 'Mrs', 'Mx', 'Dr', 'Other'];
 
+    // Handle input changes for all form fields
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    // Validate password: at least 8 chars, 1 number, 1 uppercase
     const validatePassword = () =>
         form.password.length >= 8 &&
         /\d/.test(form.password) &&
         /[A-Z]/.test(form.password);
 
+    // Validate email: must be alphanumeric and end with .com
     const validateEmail = () => {
         const emailRegex = /^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.(com)$/;
         return emailRegex.test(form.email);
     };
 
+    // Calculate age from date of birth
     const getAge = (dob) => {
         const birth = new Date(dob);
         const now = new Date();
@@ -55,6 +63,7 @@ export default function RegistrationPage() {
         return age;
     };
 
+    // Redirect to login after successful registration
     useEffect(() => {
         if (success) {
             const timer = setTimeout(() => {
@@ -64,31 +73,38 @@ export default function RegistrationPage() {
         }
     }, [success, navigate]);
 
+    // Handle form submission and validation
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
+        // Check if passwords match
         if (form.password !== form.confirmPassword) {
             return setError('Passwords do not match.');
         }
+        // Validate password strength
         if (!validatePassword()) {
             return setError(
                 'Password must be at least 8 characters, include a number and an uppercase letter.'
             );
         }
+        // Validate email format
         if (!validateEmail()) {
             return setError('Email must be valid and end with ".com"');
         }
+        // Validate age
         const age = getAge(form.dob);
         if (age < 0 || age > 100) {
             return setError('Please enter a valid birthdate.');
         }
 
+        // Prepare payload for backend
         const payload = { ...form, googleUser: false, registered: true };
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:8080/api/users/register', {
+            // Send registration request to backend
+            const res = await fetch('http://localhost:8080/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -97,6 +113,7 @@ export default function RegistrationPage() {
             if (res.ok) {
                 setSuccess(true);
             } else {
+                // Handle duplicate email or other errors
                 const data = await res.json();
                 if (data.message && data.message.toLowerCase().includes('email')) {
                     setError('Email is already in use.');
@@ -111,6 +128,7 @@ export default function RegistrationPage() {
         }
     };
 
+    // Warn if user is under 18
     const ageWarning =
         form.dob && new Date().getFullYear() - new Date(form.dob).getFullYear() < 18;
 
@@ -136,6 +154,7 @@ export default function RegistrationPage() {
                     textAlign: 'center',
                 }}
             >
+                {/* Logo */}
                 <Box sx={{ mb: 2 }}>
                     <img
                         src="/bankmesh-logo.png"
@@ -144,6 +163,7 @@ export default function RegistrationPage() {
                     />
                 </Box>
 
+                {/* Show success message if registered, else show form */}
                 {success ? (
                     <>
                         <Typography variant="h4" fontWeight="700" gutterBottom>
@@ -163,13 +183,16 @@ export default function RegistrationPage() {
                             Start banking smarter today.
                         </Typography>
 
+                        {/* Show error if any */}
                         {error && (
                             <Alert severity="error" sx={{ mb: 2, textAlign: 'left' }}>
                                 {error}
                             </Alert>
                         )}
 
+                        {/* Registration form */}
                         <Box component="form" onSubmit={handleSubmit} noValidate>
+                            {/* Name fields */}
                             <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                                 <TextField
                                     name="firstName"
@@ -191,6 +214,7 @@ export default function RegistrationPage() {
                                 />
                             </Box>
 
+                            {/* Title and DOB fields */}
                             <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                                 <TextField
                                     name="title"
@@ -220,6 +244,7 @@ export default function RegistrationPage() {
                                     onChange={handleChange}
                                 />
                             </Box>
+                            {/* Age validation feedback */}
                             {form.dob && (
                                 <Typography
                                     variant="caption"
@@ -243,6 +268,7 @@ export default function RegistrationPage() {
                                 </Typography>
                             )}
 
+                            {/* Email field with validation feedback */}
                             <Box sx={{ mb: 2 }}>
                                 <TextField
                                     name="email"
@@ -271,6 +297,7 @@ export default function RegistrationPage() {
                                 )}
                             </Box>
 
+                            {/* Password and confirm password fields */}
                             <Box sx={{ display: 'flex', gap: 2, mb: 1.5 }}>
                                 <TextField
                                     name="password"
@@ -294,6 +321,7 @@ export default function RegistrationPage() {
                                 />
                             </Box>
 
+                            {/* Password requirements hint */}
                             <Typography
                                 variant="caption"
                                 sx={{
@@ -306,6 +334,7 @@ export default function RegistrationPage() {
                                 Must include: 1 uppercase, 1 number, 8+ characters
                             </Typography>
 
+                            {/* Submit button */}
                             <Button
                                 type="submit"
                                 fullWidth
@@ -325,6 +354,7 @@ export default function RegistrationPage() {
                             </Button>
                         </Box>
 
+                        {/* Link to login page */}
                         <Typography variant="body2" sx={{ mt: 3 }}>
                             Already have an account?{' '}
                             <Button
@@ -339,6 +369,7 @@ export default function RegistrationPage() {
                     </>
                 )}
 
+                {/* Footer */}
                 <Typography variant="caption" sx={{ mt: 3, color: 'text.secondary' }}>
                     © 2025 BankMesh. Trusted by 1 user worldwide.
                 </Typography>

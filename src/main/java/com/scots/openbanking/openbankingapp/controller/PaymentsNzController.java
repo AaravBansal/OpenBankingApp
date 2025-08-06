@@ -18,10 +18,6 @@ public class PaymentsNzController {
     @GetMapping("/accounts")
     public ResponseEntity<String> getAccounts() throws Exception {
 
-        // read the json file and return
-
-
-
         // Step 1: Get access token
         String accessToken = tokenService.getAccessToken();
 

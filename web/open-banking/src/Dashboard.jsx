@@ -23,11 +23,17 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 
+// Dashboard component: main user landing page after login
 const Dashboard = () => {
+    // State for user's full name (displayed in header)
     const [userFullName, setUserFullName] = useState('');
+    // State for hamburger menu anchor
     const [anchorEl, setAnchorEl] = useState(null);
+    // State for modal (dialog) open/close
     const [openModal, setOpenModal] = useState(false);
+    // Which modal content to show (Account Preferences, Help, etc.)
     const [modalContent, setModalContent] = useState('');
+    // User profile data
     const [userData, setUserData] = useState({
         firstName: '',
         lastName: '',
@@ -37,21 +43,22 @@ const Dashboard = () => {
         isGoogleUser: false,
     });
 
+    // Editable fields for preferences modal
     const [preferredName, setPreferredName] = useState('');
     const [title, setTitle] = useState('');
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
 
-    // Bank accounts & loading states
+    // Bank accounts and loading state
     const [bankAccounts, setBankAccounts] = useState([]);
     const [loadingAccounts, setLoadingAccounts] = useState(false);
 
-    // For Add Account flow
+    // State for add account flow
     const [addingAccount, setAddingAccount] = useState(false);
     const [loadingNewAccounts, setLoadingNewAccounts] = useState(false);
 
+    // On mount, fetch user profile for dashboard header and preferences
     useEffect(() => {
-        // Simulate fetching user data for dashboard
         fetch('/me')
             .then((res) => res.json())
             .then((data) => {
@@ -74,21 +81,25 @@ const Dashboard = () => {
             .catch(() => setUserFullName('User Name'));
     }, []);
 
+    // Hamburger menu handlers
     const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
     const handleMenuClose = () => setAnchorEl(null);
 
+    // Open a modal section (Account Preferences, Help, etc.)
     const openSection = (section) => {
         setModalContent(section);
         setOpenModal(true);
         handleMenuClose();
     };
 
+    // Close modal and reset password fields
     const handleCloseModal = () => {
         setOpenModal(false);
         setPassword('');
         setPasswordError('');
     };
 
+    // Validate password for preferences update
     const validatePassword = (pwd) => {
         if (pwd.length > 0 && pwd.length < 8) {
             setPasswordError('Password must be at least 8 characters');
@@ -98,6 +109,7 @@ const Dashboard = () => {
         return true;
     };
 
+    // Submit updated account preferences (preferred name, title, password)
     const handleAccountPreferencesSubmit = () => {
         if (!validatePassword(password)) return;
 
@@ -129,7 +141,7 @@ const Dashboard = () => {
             .catch(() => alert('Failed to update preferences'));
     };
 
-    // Fetch existing accounts from backend
+    // Fetch all accounts for the user (called on demand)
     const fetchAccounts = () => {
         setLoadingAccounts(true);
         fetch('/account-details')
@@ -144,7 +156,7 @@ const Dashboard = () => {
             .finally(() => setLoadingAccounts(false));
     };
 
-    // Called when user clicks Payments NZ button to add accounts
+    // Simulate adding accounts from Payments NZ (demo/fake data)
     const loadPaymentsNZAccounts = () => {
         setLoadingNewAccounts(true);
         setTimeout(() => {
@@ -159,14 +171,14 @@ const Dashboard = () => {
                 })
                 .catch((err) => alert('Error loading accounts: ' + err.message))
                 .finally(() => setLoadingNewAccounts(false));
-        }, 2500); // 2.5 seconds fake delay for loading spinner
+        }, 2500); // Simulate loading spinner
     };
 
-    // New function added exactly here:
+    // Add accounts from real Payments NZ API (real data)
     const loadPaymentsNZRealAccounts = () => {
         setLoadingNewAccounts(true);
         setTimeout(() => {
-            fetch('http://localhost:8080/api/accounts') // <-- your real API endpoint here
+            fetch('http://localhost:8080/api/accounts')
                 .then((res) => {
                     if (!res.ok) throw new Error('Failed to load real account details');
                     return res.json();
@@ -180,8 +192,10 @@ const Dashboard = () => {
         }, 2500);
     };
 
+    // Render modal content based on which section is open
     const renderModalContent = () => {
         if (modalContent === 'Account Preferences') {
+            // Modal for editing user preferences
             return (
                 <Box sx={{ minWidth: 360 }}>
                     <Typography variant="h5" fontWeight="bold" mb={3}>
@@ -240,6 +254,7 @@ const Dashboard = () => {
             );
         }
         if (modalContent === 'Security and Privacy') {
+            // Modal for security and privacy info
             return (
                 <Box sx={{ maxWidth: 500 }}>
                     <Typography variant="h5" fontWeight="bold" mb={3}>
@@ -272,6 +287,7 @@ const Dashboard = () => {
             );
         }
         if (modalContent === 'Help and Support') {
+            // Modal for help and support info
             return (
                 <Box sx={{ maxWidth: 450 }}>
                     <Typography variant="h5" fontWeight="bold" mb={3}>
@@ -298,6 +314,7 @@ const Dashboard = () => {
             );
         }
         if (modalContent === 'Sign Out') {
+            // Modal for sign out confirmation
             return (
                 <Box sx={{ maxWidth: 360, textAlign: 'center' }}>
                     <Typography variant="h5" fontWeight="bold" mb={3}>
@@ -324,6 +341,7 @@ const Dashboard = () => {
                 </Box>
             );
         }
+        // Default modal content (fallback)
         return (
             <Box sx={{ minWidth: 400 }}>
                 <Typography variant="h5" fontWeight="bold" mb={2}>
@@ -345,6 +363,7 @@ const Dashboard = () => {
                 pb: 4,
             }}
         >
+            {/* AppBar/Header with logo, navigation, and user menu */}
             <AppBar
                 position="static"
                 color="transparent"
@@ -371,6 +390,7 @@ const Dashboard = () => {
                         </Button>
                     </Stack>
 
+                    {/* User name and hamburger menu */}
                     <Stack direction="row" alignItems="center" spacing={1}>
                         <Typography
                             variant="body1"
@@ -408,6 +428,7 @@ const Dashboard = () => {
                 </Toolbar>
             </AppBar>
 
+            {/* Main content: list of bank accounts */}
             <Box sx={{ maxWidth: 900, mx: 'auto', mt: 5, px: 2 }}>
                 {bankAccounts.map((account) => (
                     <Paper
@@ -448,7 +469,7 @@ const Dashboard = () => {
                                     textTransform: 'none',
                                 }}
                                 onClick={() => {
-                                    // Map bankId to URLs as you like
+                                    // Open bank website in new tab based on bankId
                                     const bankUrlMap = {
                                         BNZNZ22: 'https://www.bnz.co.nz',
                                         ASBNZ22: 'https://www.asb.co.nz',
@@ -464,6 +485,7 @@ const Dashboard = () => {
                     </Paper>
                 ))}
 
+                {/* Add account button/panel */}
                 {!addingAccount && (
                     <Paper
                         elevation={3}
@@ -485,6 +507,7 @@ const Dashboard = () => {
                     </Paper>
                 )}
 
+                {/* Add account provider selection */}
                 {addingAccount && (
                     <Paper
                         elevation={3}
@@ -511,7 +534,7 @@ const Dashboard = () => {
                                     Payments NZ
                                 </Button>
 
-                                {/* NEW PNZ (Real) button added below */}
+                                {/* Button for real Payments NZ API */}
                                 <Button
                                     variant="contained"
                                     sx={{ mb: 1, bgcolor: '#1e90ff', '&:hover': { bgcolor: '#0056b3' } }}
@@ -530,6 +553,7 @@ const Dashboard = () => {
                             </>
                         )}
 
+                        {/* Show loading spinner while fetching accounts */}
                         {loadingNewAccounts && (
                             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <CircularProgress sx={{ color: '#1e90ff', mb: 2.5 }} />
@@ -540,7 +564,7 @@ const Dashboard = () => {
                 )}
             </Box>
 
-            {/* Modal for hamburger sections */}
+            {/* Modal for account preferences, help, etc. */}
             <Modal
                 open={openModal}
                 onClose={handleCloseModal}
