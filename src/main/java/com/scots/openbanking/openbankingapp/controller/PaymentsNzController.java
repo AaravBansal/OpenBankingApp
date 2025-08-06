@@ -18,10 +18,9 @@ public class PaymentsNzController {
     @GetMapping("/accounts")
     public ResponseEntity<String> getAccounts() throws Exception {
 
-        // Step 1: Get access token
+
         String accessToken = tokenService.getAccessToken();
 
-        // Step 2: Prepare HTTP headers
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -29,10 +28,8 @@ public class PaymentsNzController {
         HttpEntity<String> entity = new HttpEntity<>(null, headers);
         RestTemplate restTemplate = new RestTemplate();
 
-        // Step 3: Replace with actual Payments NZ endpoint for accounts
         String url = "https://sandbox.api.apicentre.paymentsnz.co.nz/open-banking/accounts/v3.0/accounts";
 
-        // Step 4: Make the call
         ResponseEntity<String> response = restTemplate.exchange(
                 url,
                 HttpMethod.GET,

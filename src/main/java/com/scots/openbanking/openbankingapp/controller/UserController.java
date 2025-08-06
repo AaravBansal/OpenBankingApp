@@ -11,6 +11,6 @@ public class UserController {
     @GetMapping("/dashboard")
     public String dashboard(Authentication auth, Model model) {
         model.addAttribute("userEmail", auth.getName());
-        return "dashboard";  // your dashboard view
+        return "dashboard";
     }
 }
