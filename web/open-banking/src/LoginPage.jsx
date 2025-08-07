@@ -21,7 +21,7 @@ export default function LoginPage({ setGoogleUser }) {
     const handleHardcodedLogin = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('🚀 Login form submitted');
+        console.log('Login form submitted');
 
         try {
             // Send login request to backend

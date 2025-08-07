@@ -328,7 +328,8 @@ const Dashboard = () => {
                             variant="contained"
                             color="error"
                             onClick={() => {
-                                alert('Signed out');
+                                // Redirect to login page on sign out
+                                window.location.href = '/login';
                                 handleCloseModal();
                             }}
                         >
@@ -358,8 +359,7 @@ const Dashboard = () => {
         <Box
             sx={{
                 minHeight: '100vh',
-                background: 'linear-gradient(135deg, #1E3C72, #2A5298)',
-                color: '#fff',
+                background: 'linear-gradient(to right, #0a5e96, #377ba9)',
                 pb: 4,
             }}
         >
