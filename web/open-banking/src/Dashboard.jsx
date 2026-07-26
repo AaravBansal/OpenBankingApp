@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
+import FinancialChat from './components/FinancialChat';
 
 // Dashboard component: main user landing page after login
 const Dashboard = () => {
@@ -594,6 +595,9 @@ const Dashboard = () => {
                     </Box>
                 </Fade>
             </Modal>
+
+            <FinancialChat />
+
         </Box>
     );
 };
