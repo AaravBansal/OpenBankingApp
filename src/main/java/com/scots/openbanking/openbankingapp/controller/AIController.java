@@ -1,5 +1,6 @@
 package com.scots.openbanking.openbankingapp.controller;
 
+import com.scots.openbanking.openbankingapp.dto.ChatRequest;
 import com.scots.openbanking.openbankingapp.service.AIService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,11 +18,11 @@ public class AIController {
     }
 
 
-    @GetMapping("/test")
-    public String testAI() throws Exception {
+    @PostMapping("/chat")
+    public String chat(@RequestBody ChatRequest request) throws Exception {
 
         return aiService.askFinancialQuestion(
-                "What accounts do I have?"
+                request.getMessage()
         );
     }
 }

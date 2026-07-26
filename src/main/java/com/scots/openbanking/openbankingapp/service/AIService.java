@@ -54,21 +54,29 @@ public class AIService {
         }
 
         String prompt = """
-                You are LNP AI, a helpful financial assistant.
+            You are LNP AI, a helpful financial assistant.
 
-                Answer the user's question using the financial information below.
+            You are answering questions about a user's financial accounts.
 
-                Financial information:
+            Rules:
+                - Only use the provided financial information.
+                - Do not invent accounts or balances.
+                - If information is unavailable, say so.
+                - Format answers clearly using markdown.
+                - Use bullet points when listing information.
 
-                %s
+
+            Financial information:
+
+            %s
 
 
-                User question:
-                %s
+            User question:
+            %s
 
 
-                Keep your answer clear and concise.
-                """.formatted(
+            Answer:
+        """.formatted(
                 financialContext,
                 question
         );
