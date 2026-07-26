@@ -1,6 +1,5 @@
 package com.scots.openbanking.openbankingapp.accounts;
 
-import com.scots.openbanking.openbankingapp.service.AccountService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

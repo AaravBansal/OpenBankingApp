@@ -1,0 +1,15 @@
+{
+  "loans": [
+    {
+      "loanId": "mortgage001",
+      "provider": "BNZ",
+      "type": "HOME_LOAN",
+      "originalAmount": 750000,
+      "currentBalance": 612500,
+      "interestRate": 6.35,
+      "termYears": 25,
+      "monthlyPayment": 4100,
+      "nextPaymentDate": "2026-02-01"
+    }
+  ]
+}

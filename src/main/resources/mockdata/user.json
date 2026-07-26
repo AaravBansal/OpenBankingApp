@@ -1,0 +1,13 @@
+{
+  "userId": "user001",
+  "name": "James Anderson",
+  "country": "New Zealand",
+  "currency": "NZD",
+  "occupation": "Mechanical Engineer",
+  "annualIncome": 105000,
+  "financialGoals": [
+    "Pay off mortgage",
+    "Build investment portfolio",
+    "Retire early"
+  ]
+}

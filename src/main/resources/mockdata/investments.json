@@ -1,0 +1,23 @@
+{
+  "investments": [
+    {
+      "provider": "Sharesies",
+      "portfolioName": "Long Term Growth",
+      "holdings": [
+        {
+          "name": "Smartshares NZ Top 50 ETF",
+          "ticker": "FNZ",
+          "units": 240,
+          "value": 8200
+        },
+        {
+          "name": "Vanguard S&P500 ETF",
+          "ticker": "VOO",
+          "units": 35,
+          "value": 15400
+        }
+      ],
+      "monthlyContribution": 500
+    }
+  ]
+}

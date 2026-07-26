@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+
 
 function FinancialChat() {
 
@@ -6,33 +8,60 @@ function FinancialChat() {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
+
     const chatEndRef = useRef(null);
 
 
+    const suggestedQuestions = [
+        "What accounts do I have?",
+        "What is my total balance?",
+        "Analyse my finances",
+        "Give me financial advice"
+    ];
+
+
+
+    const initialMessage = {
+        sender: "ai",
+        text:
+            `👋 Hi! I'm Bank Mesh AI.
+
+I can help you understand your accounts, balances, and financial data.
+
+Try asking me something below.`,
+        time: new Date()
+    };
+
+
+
     const [messages, setMessages] = useState([
-        {
-            sender: "ai",
-            text: "Hi! I'm your Bank Mesh AI assistant. Ask me anything about your accounts."
-        }
+        initialMessage
     ]);
+
 
 
     useEffect(() => {
 
         chatEndRef.current?.scrollIntoView({
-            behavior: "smooth"
+            behavior:"smooth"
         });
 
-    }, [messages]);
+    }, [messages, loading]);
 
 
 
-    const sendMessage = async () => {
-
-        if (!message.trim() || loading) return;
 
 
-        const userText = message;
+    const sendMessage = async (overrideMessage=null) => {
+
+
+        const userText =
+            overrideMessage || message;
+
+
+        if(!userText.trim() || loading)
+            return;
+
 
 
         setMessages(prev => [
@@ -40,16 +69,19 @@ function FinancialChat() {
             {
                 sender:"user",
                 text:userText,
-                time:new Date().toLocaleTimeString()
+                time:new Date()
             }
         ]);
+
 
 
         setMessage("");
         setLoading(true);
 
 
+
         try {
+
 
             const response = await fetch(
                 "http://localhost:8080/api/ai/chat",
@@ -65,7 +97,15 @@ function FinancialChat() {
             );
 
 
+
+            if(!response.ok){
+                throw new Error("AI request failed");
+            }
+
+
+
             const data = await response.json();
+
 
 
             setMessages(prev => [
@@ -73,24 +113,28 @@ function FinancialChat() {
                 {
                     sender:"ai",
                     text:data.reply,
-                    time:new Date().toLocaleTimeString()
+                    time:new Date()
                 }
             ]);
 
 
-        } catch(error) {
+
+        }
+        catch(error){
 
 
             setMessages(prev => [
                 ...prev,
                 {
                     sender:"ai",
-                    text:"Sorry, I couldn't connect to the AI service.",
-                    time:new Date().toLocaleTimeString()
+                    text:
+                        "⚠️ Sorry, I couldn't connect to the AI service.",
+                    time:new Date()
                 }
             ]);
 
         }
+
 
 
         setLoading(false);
@@ -99,131 +143,364 @@ function FinancialChat() {
 
 
 
+
+
+    const formatTime = (time)=>{
+
+        return new Date(time)
+            .toLocaleTimeString([],{
+                hour:"2-digit",
+                minute:"2-digit"
+            });
+
+    };
+
+
+
+
+
+    const clearChat = ()=>{
+
+        setMessages([
+            initialMessage
+        ]);
+
+    };
+
+
+
+
+
     return (
 
         <>
 
+
             {open && (
 
+
                 <div
+
                     style={{
+
                         position:"fixed",
-                        bottom:"90px",
+
+                        bottom:"95px",
+
                         right:"30px",
-                        width:"380px",
-                        height:"550px",
+
+                        width:"400px",
+
+                        height:"600px",
+
+                        maxWidth:"90vw",
+
                         background:"#f8fafc",
-                        borderRadius:"20px",
-                        boxShadow:"0 10px 40px rgba(0,0,0,0.25)",
+
+                        borderRadius:"22px",
+
+                        boxShadow:
+                            "0 15px 50px rgba(0,0,0,0.25)",
+
                         display:"flex",
+
                         flexDirection:"column",
+
                         overflow:"hidden",
-                        zIndex:1000
+
+                        zIndex:2000
+
                     }}
+
                 >
 
 
-                    {/* Header */}
+
+
+                    {/* HEADER */}
 
                     <div
+
                         style={{
-                            padding:"18px",
-                            background:"#1e90ff",
+
+                            background:
+                                "linear-gradient(135deg,#1e90ff,#0056b3)",
+
                             color:"white",
-                            fontWeight:"700",
+
+                            padding:"18px",
+
                             display:"flex",
-                            justifyContent:"space-between"
+
+                            justifyContent:"space-between",
+
+                            alignItems:"center"
+
                         }}
+
                     >
 
-                    <span>
-                        🤖 Bank Mesh AI
-                    </span>
+
+                        <div>
+
+                            <div
+                                style={{
+                                    fontSize:"18px",
+                                    fontWeight:"700"
+                                }}
+                            >
+                                🤖 Bank Mesh AI
+                            </div>
 
 
-                        <span
-                            style={{
-                                cursor:"pointer"
-                            }}
-                            onClick={() => setOpen(false)}
-                        >
-                        ✕
-                    </span>
+                            <div
+                                style={{
+                                    fontSize:"12px",
+                                    opacity:0.85
+                                }}
+                            >
+                                Your personal financial assistant
+                            </div>
+
+                        </div>
+
+
+
+                        <div>
+
+
+                            <button
+
+                                onClick={clearChat}
+
+                                style={{
+
+                                    marginRight:"10px",
+
+                                    background:"transparent",
+
+                                    border:"none",
+
+                                    color:"white",
+
+                                    cursor:"pointer"
+
+                                }}
+
+                            >
+                                🗑
+                            </button>
+
+
+
+                            <button
+
+                                onClick={()=>setOpen(false)}
+
+                                style={{
+
+                                    background:"transparent",
+
+                                    border:"none",
+
+                                    color:"white",
+
+                                    cursor:"pointer",
+
+                                    fontSize:"18px"
+
+                                }}
+
+                            >
+
+                                ✕
+
+                            </button>
+
+
+                        </div>
+
+
 
                     </div>
 
 
 
-                    {/* Messages */}
+
+
+                    {/* CHAT AREA */}
+
 
                     <div
+
                         style={{
+
                             flex:1,
+
                             padding:"15px",
+
                             overflowY:"auto"
+
                         }}
+
                     >
+
 
 
                         {messages.map((msg,index)=>(
 
+
                             <div
+
                                 key={index}
+
                                 style={{
+
                                     marginBottom:"15px",
+
                                     textAlign:
                                         msg.sender==="user"
                                             ?"right"
                                             :"left"
+
                                 }}
+
                             >
 
 
+
                                 <div
+
                                     style={{
+
                                         display:"inline-block",
-                                        maxWidth:"80%",
-                                        padding:"12px 15px",
-                                        borderRadius:"18px",
+
+                                        maxWidth:"85%",
+
+                                        padding:"12px 16px",
+
+                                        borderRadius:
+                                            msg.sender==="user"
+                                                ?"18px 18px 5px 18px"
+                                                :"18px 18px 18px 5px",
+
+
                                         background:
+
                                             msg.sender==="user"
-                                                ? "#1e90ff"
-                                                :"white",
+
+                                                ?
+
+                                                "#1e90ff"
+
+                                                :
+
+                                                "white",
+
+
                                         color:
+
                                             msg.sender==="user"
-                                                ?"white"
-                                                :"#111",
-                                        boxShadow:"0 2px 8px rgba(0,0,0,0.08)",
-                                        whiteSpace:"pre-wrap"
+
+                                                ?
+
+                                                "white"
+
+                                                :
+
+                                                "#111827",
+
+
+                                        boxShadow:
+                                            "0 3px 10px rgba(0,0,0,0.08)",
+
+
+                                        textAlign:"left"
+
                                     }}
+
                                 >
 
-                                    {msg.text}
+
+
+                                    {msg.sender==="ai" ? (
+
+                                        <ReactMarkdown>
+                                            {msg.text}
+                                        </ReactMarkdown>
+
+                                    ):(
+
+                                        msg.text
+
+                                    )}
+
+
+
+
+                                    <div
+
+                                        style={{
+
+                                            fontSize:"10px",
+
+                                            opacity:0.6,
+
+                                            marginTop:"6px"
+
+                                        }}
+
+                                    >
+
+                                        {formatTime(msg.time)}
+
+                                    </div>
+
 
 
                                 </div>
 
 
+
                             </div>
 
+
                         ))}
+
 
 
 
                         {loading && (
 
                             <div
+
                                 style={{
-                                    color:"#666",
-                                    fontStyle:"italic"
+
+                                    background:"white",
+
+                                    padding:"12px",
+
+                                    borderRadius:"15px",
+
+                                    width:"100px",
+
+                                    boxShadow:
+                                        "0 3px 10px rgba(0,0,0,0.08)"
+
                                 }}
+
                             >
 
-                                AI is thinking • • •
+                                Thinking
+                                <span className="dots">
+                ...
+            </span>
+
 
                             </div>
 
                         )}
+
 
 
                         <div ref={chatEndRef}/>
@@ -233,16 +510,88 @@ function FinancialChat() {
 
 
 
-                    {/* Input */}
+
+
+
+
+                    {/* SUGGESTIONS */}
+
+                    {messages.length === 1 && (
+
+                        <div
+
+                            style={{
+
+                                padding:"10px"
+
+                            }}
+
+                        >
+
+
+                            {suggestedQuestions.map((q,index)=>(
+
+
+                                <button
+
+                                    key={index}
+
+                                    onClick={()=>sendMessage(q)}
+
+                                    style={{
+
+                                        margin:"4px",
+
+                                        padding:"8px 12px",
+
+                                        borderRadius:"20px",
+
+                                        border:"1px solid #ddd",
+
+                                        background:"white",
+
+                                        cursor:"pointer",
+
+                                        fontSize:"12px"
+
+                                    }}
+
+                                >
+
+                                    {q}
+
+                                </button>
+
+
+                            ))}
+
+
+                        </div>
+
+                    )}
+
+
+
+
+                    {/* INPUT */}
+
 
                     <div
+
                         style={{
+
                             display:"flex",
+
                             padding:"12px",
+
                             background:"white",
+
                             borderTop:"1px solid #ddd"
+
                         }}
+
                     >
+
 
                         <input
 
@@ -250,43 +599,69 @@ function FinancialChat() {
 
                             disabled={loading}
 
-                            onChange={(e)=>
-                                setMessage(e.target.value)
-                            }
+                            onChange={(e)=>setMessage(e.target.value)}
+
 
                             onKeyDown={(e)=>{
-                                if(e.key==="Enter"){
+
+                                if(e.key==="Enter")
                                     sendMessage();
-                                }
+
                             }}
+
 
                             placeholder="Ask about your finances..."
 
+
                             style={{
+
                                 flex:1,
+
                                 borderRadius:"20px",
+
                                 border:"1px solid #ccc",
+
                                 padding:"12px",
+
                                 outline:"none"
+
                             }}
 
                         />
 
 
-                        <button
 
-                            onClick={sendMessage}
+                        <button
 
                             disabled={loading}
 
+                            onClick={()=>sendMessage()}
+
+
                             style={{
+
                                 marginLeft:"8px",
-                                borderRadius:"50%",
+
                                 width:"45px",
+
+                                height:"45px",
+
+                                borderRadius:"50%",
+
+
                                 border:"none",
-                                background:"#1e90ff",
+
+                                background:
+                                    loading
+                                        ?
+                                        "#aaa"
+                                        :
+                                        "#1e90ff",
+
                                 color:"white",
+
                                 cursor:"pointer"
+
                             }}
 
                         >
@@ -299,30 +674,56 @@ function FinancialChat() {
                     </div>
 
 
+
+
                 </div>
+
 
             )}
 
 
 
+
+
+
+            {/* FLOAT BUTTON */}
+
+
             <button
+
 
                 onClick={()=>setOpen(!open)}
 
+
                 style={{
+
                     position:"fixed",
+
                     bottom:"25px",
+
                     right:"30px",
+
                     width:"65px",
+
                     height:"65px",
+
                     borderRadius:"50%",
+
                     border:"none",
+
                     background:"#1e90ff",
+
                     color:"white",
+
                     fontSize:"28px",
+
                     cursor:"pointer",
-                    boxShadow:"0 5px 15px rgba(0,0,0,0.25)",
-                    zIndex:1001
+
+                    boxShadow:
+                        "0 8px 25px rgba(0,0,0,0.3)",
+
+                    zIndex:2001
+
                 }}
 
             >
@@ -335,6 +736,7 @@ function FinancialChat() {
         </>
 
     );
+
 }
 
 

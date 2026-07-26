@@ -1,48 +1,79 @@
 package com.scots.openbanking.openbankingapp.service;
 
-import com.scots.openbanking.openbankingapp.dto.AccountDTO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import java.util.List;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class FinancialDataCacheService {
 
-    private final AccountDetailsService accountDetailsService;
-    private List<AccountDTO> accounts;
 
-    public FinancialDataCacheService(
-            AccountDetailsService accountDetailsService
-    ) {
+    private final ObjectMapper mapper = new ObjectMapper();
 
-        this.accountDetailsService = accountDetailsService;
+    private final Map<String, JsonNode> financialData =
+            new HashMap<>();
 
-        refresh();
-    }
 
-    public void refresh() {
-        try {
-            accounts =
-                    accountDetailsService.getCombinedAccounts();
 
-            System.out.println(
-                    "Financial data loaded into cache"
-            );
+    @PostConstruct
+    public void loadData() throws Exception {
 
-        } catch(Exception e) {
 
-            throw new RuntimeException(
-                    "Could not load financial cache",
-                    e
-            );
-        }
-    }
+        loadFile("accounts");
+        loadFile("transactions");
+        loadFile("loans");
+        loadFile("investments");
 
-    public List<AccountDTO> getAccounts() {
 
         System.out.println(
-                "Using financial cache"
+                "Financial JSON loaded into memory"
         );
 
-        return accounts;
     }
+
+
+
+    private void loadFile(String name) throws Exception {
+
+
+        InputStream input =
+                new ClassPathResource(
+                        "mockdata/" + name + ".json"
+                )
+                        .getInputStream();
+
+
+        JsonNode json =
+                mapper.readTree(input);
+
+
+        financialData.put(
+                name,
+                json
+        );
+
+    }
+
+
+
+    public JsonNode getData(String name){
+
+        return financialData.get(name);
+
+    }
+
+
+
+    public Map<String, JsonNode> getAllData(){
+
+        return financialData;
+
+    }
+
 }
