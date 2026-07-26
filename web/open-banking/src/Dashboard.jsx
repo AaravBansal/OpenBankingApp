@@ -430,7 +430,7 @@ const Dashboard = () => {
 
             {/* Main content: list of bank accounts */}
             <Box sx={{ maxWidth: 900, mx: 'auto', mt: 5, px: 2 }}>
-                {bankAccounts.map((account) => (
+                 {bankAccounts.map((account) => (
                     <Paper
                         key={account.accountId}
                         elevation={3}
