@@ -11,15 +11,14 @@ public class FinancialSummaryService {
 
 
     private final FinancialDataCacheService cacheService;
-    private final NumberParserService numberParserService;
 
 
     public FinancialSummaryService(
-            FinancialDataCacheService cacheService,
-            NumberParserService numberParserService
+            FinancialDataCacheService cacheService
     ) {
+
         this.cacheService = cacheService;
-        this.numberParserService = numberParserService;
+
     }
 
 
@@ -32,17 +31,19 @@ public class FinancialSummaryService {
 
 
 
-        double totalBalance = accounts.stream()
-                .mapToDouble(account ->
-                        numberParserService.parseMoney(
-                                account.getBalance()
+        double totalBalance =
+                accounts.stream()
+
+                        .mapToDouble(
+                                AccountDTO::getBalance
                         )
-                )
-                .sum();
+
+                        .sum();
 
 
 
         return """
+                
                 Financial Summary:
 
                 Number of accounts:
@@ -51,10 +52,11 @@ public class FinancialSummaryService {
                 Combined balance:
                 %.2f NZD
 
-                """.formatted(
-                accounts.size(),
-                totalBalance
-        );
+                """
+                .formatted(
+                        accounts.size(),
+                        totalBalance
+                );
 
     }
 

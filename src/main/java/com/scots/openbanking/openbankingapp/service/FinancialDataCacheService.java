@@ -2,12 +2,14 @@ package com.scots.openbanking.openbankingapp.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scots.openbanking.openbankingapp.dto.AccountDTO;
 import jakarta.annotation.PostConstruct;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -76,4 +78,7 @@ public class FinancialDataCacheService {
 
     }
 
+    public List<AccountDTO> getAccounts() {
+        return List.of();
+    }
 }

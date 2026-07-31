@@ -1,4 +1,5 @@
-package com.scots.openbanking.openbankingapp.service;
+package com.scots.openbanking.openbankingapp.controller;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scots.openbanking.openbankingapp.dto.AccountDTO;
@@ -6,9 +7,11 @@ import com.scots.openbanking.openbankingapp.model.AccountsWrapper;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 @Service
@@ -18,22 +21,26 @@ public class AccountDetailsService {
     private final ObjectMapper objectMapper;
 
 
+
     public AccountDetailsService(
             ObjectMapper objectMapper
     ) {
+
         this.objectMapper = objectMapper;
+
     }
 
 
 
-    public List<AccountDTO> getCombinedAccounts() throws Exception {
+
+    public List<AccountDTO> getCombinedAccounts()
+            throws Exception {
 
 
         InputStream inputStream =
                 new ClassPathResource(
                         "mockdata/accounts.json"
-                )
-                        .getInputStream();
+                ).getInputStream();
 
 
 
@@ -50,9 +57,10 @@ public class AccountDetailsService {
 
 
 
-        for(AccountsWrapper.Account account :
-                wrapper.getData().getAccount()) {
-
+        for(
+                AccountsWrapper.Account account :
+                wrapper.getData().getAccount()
+        ){
 
 
             AccountDTO dto =
@@ -85,9 +93,10 @@ public class AccountDetailsService {
             );
 
 
-            dto.setBankId(
+            dto.setBankName(
                     account.getBankName()
             );
+
 
             accounts.add(dto);
 

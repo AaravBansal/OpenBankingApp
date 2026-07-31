@@ -2,19 +2,20 @@ package com.scots.openbanking.openbankingapp.model;
 
 import java.util.List;
 
+
 public class AccountsWrapper {
 
 
-    private Data Data;
+    private Data data;
 
 
     public Data getData() {
-        return Data;
+        return data;
     }
 
 
     public void setData(Data data) {
-        Data = data;
+        this.data = data;
     }
 
 
@@ -42,11 +43,16 @@ public class AccountsWrapper {
 
 
         private String accountId;
+
         private String nickname;
+
         private String accountType;
+
         private String currency;
+
         private String bankName;
-        private double balance;
+
+        private Double balance;
 
 
 
@@ -60,6 +66,7 @@ public class AccountsWrapper {
         }
 
 
+
         public String getNickname() {
             return nickname;
         }
@@ -68,6 +75,7 @@ public class AccountsWrapper {
         public void setNickname(String nickname) {
             this.nickname = nickname;
         }
+
 
 
         public String getAccountType() {
@@ -80,6 +88,7 @@ public class AccountsWrapper {
         }
 
 
+
         public String getCurrency() {
             return currency;
         }
@@ -88,6 +97,7 @@ public class AccountsWrapper {
         public void setCurrency(String currency) {
             this.currency = currency;
         }
+
 
 
         public String getBankName() {
@@ -100,12 +110,13 @@ public class AccountsWrapper {
         }
 
 
-        public String getBalance() {
+
+        public Double getBalance() {
             return balance;
         }
 
 
-        public void setBalance(double balance) {
+        public void setBalance(Double balance) {
             this.balance = balance;
         }
 
