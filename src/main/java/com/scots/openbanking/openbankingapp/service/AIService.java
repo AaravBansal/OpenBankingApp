@@ -17,12 +17,14 @@ public class AIService {
     }
 
     public String askFinancialQuestion(String question) throws Exception {
-
+        // One timer covers insight generation and model inference, making it
+        // easier to observe the total latency of an AI request.
         long start = System.currentTimeMillis();
 
         System.out.println("AI request started");
 
-        // Get all financial insights
+        // Generate fresh context for every request so the model answers from
+        // the latest account and transaction data.
         String financialContext = financialInsightsService.generateInsights();
 
         System.out.println(
@@ -30,7 +32,8 @@ public class AIService {
                         + (System.currentTimeMillis() - start)
                         + " ms"
         );
-
+        // The prompt explicitly bounds the model to the supplied financial
+        // context, reducing the risk of fabricated balances or transactions.
         String prompt = """
                 You are LNP AI, an intelligent personal financial assistant.
 
@@ -57,6 +60,7 @@ public class AIService {
                 """
                 .formatted(financialContext, question);
 
+        // Ollama performs the final inference using the assembled prompt.
         String response = ollamaService.askAI(prompt);
 
         System.out.println(
